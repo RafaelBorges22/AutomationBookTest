@@ -1,0 +1,9 @@
+# Dependências
+node_modules/
+jspm_packages/
+
+# Arquivos gerados pelo script (Excel)
+*.xlsx
+Caderno_Casos_de_Testes.xlsx
+
+package-lock.json

@@ -1,0 +1,23 @@
+{
+  "name": "gerador-testes-swagger",
+  "version": "1.0.0",
+  "description": "Script para gerar CTs baseados em Swagger OpenAPI",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^10.1.1",
+    "dayjs": "^1.11.20",
+    "exceljs": "^4.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.37",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
