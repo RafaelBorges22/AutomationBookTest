@@ -48,4 +48,13 @@ cd AutomationBookTest
 
 # Instale as dependências
 npm install
+```
+
+## 🛠️ Usabilidade
+
+```bash
+# rode o comando
+npm start
+
+# siga os passo a passo pelo seu cmd
 
