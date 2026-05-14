@@ -1,4 +1,4 @@
-# 📑 Gerador de Casos de Teste - API MVNO
+# 📑 Gerador de Caderno de Teste - API
 
 > Utilitário em Node.js (TypeScript) para automação e geração de cadernos de testes no Excel a partir de documentação Swagger/OpenAPI.
 
@@ -58,3 +58,10 @@ npm start
 
 # siga os passo a passo pelo seu cmd
 
+## 🛠️ Usabilidade
+
+```bash
+# rode o comando
+npm start
+
+# siga os passo a passo pelo seu cmd
