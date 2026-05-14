@@ -19,13 +19,13 @@ O sistema utiliza **ExcelJS** para criar arquivos com cabeçalhos estilizados, f
 
 ## 🚀 Tecnologias Utilizadas
 
-| Tecnologia | Finalidade |
-|---|---|
-| Node.js | Ambiente de execução |
-| TypeScript | Linguagem principal e tipagem |
-| ExcelJS | Manipulação e estilização de planilhas Excel |
-| Swagger Parser | Parsing e resolução de $refs do OpenAPI |
-| Readline | Interface CLI interativa |
+| Tecnologia     | Finalidade                                       |
+| -------------- | ------------------------------------------------ |
+| Node.js        | Ambiente de execução                           |
+| TypeScript     | Linguagem principal e tipagem                    |
+| ExcelJS        | Manipulação e estilização de planilhas Excel |
+| Swagger Parser | Parsing e resolução de $refs do OpenAPI        |
+| Readline       | Interface CLI interativa                         |
 
 ---
 
@@ -50,18 +50,21 @@ cd AutomationBookTest
 npm install
 ```
 
-## 🛠️ Usabilidade
+## 🛠️ Usabilidade pelo CMD
 
 ```bash
 # rode o comando
 npm start
 
 # siga os passo a passo pelo seu cmd
+```
 
-## 🛠️ Usabilidade
+
+## 🛠️ Usabilidade pela Web
 
 ```bash
 # rode o comando
-npm start
+npm run dev
 
-# siga os passo a passo pelo seu cmd
+# siga os passo a passo pelo seu chat
+```

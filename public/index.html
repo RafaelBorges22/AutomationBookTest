@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutomationBookTest | Stigma</title>
+  <link rel="icon" type="image/ " href="./assets/logo_stigma.png" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #000000; /* Preto */
+      color: #ffffff; /* Branco */
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      height: 95vh;
+      background: #121212;
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      border: 1px solid #333;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: #1a1a1a;
+      border-right: 2px solid #e11d48; /* Detalhe em Vermelho */
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-container {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-container img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 10px;
+      border-radius: 15px;
+    }
+
+    .sidebar h1 {
+      color: #ffffff;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    .steps {
+      width: 100%;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step {
+      padding: 14px;
+      border-radius: 8px;
+      background: #262626;
+      border: 1px solid #404040;
+      color: #a3a3a3;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .step.active {
+      border-color: #e11d48; /* Vermelho */
+      background: #e11d48;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    /* Chat Area */
+    .chat-area {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      background: #ffffff; /* Fundo do chat em Branco para contraste */
+    }
+
+    .chat-header {
+      padding: 20px;
+      border-bottom: 1px solid #e5e5e5;
+      background: #f8f8f8;
+      color: #1a1a1a;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: #f4f4f5;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 16px;
+      border-radius: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+    }
+
+    .bot {
+      background: #ffffff;
+      color: #1a1a1a;
+      align-self: flex-start;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .user {
+      background: #e11d48; /* Vermelho */
+      color: #ffffff;
+      align-self: flex-end;
+      box-shadow: 0 2px 5px rgba(225, 29, 72, 0.2);
+    }
+
+    /* Input Area */
+    .input-area {
+      border-top: 1px solid #e5e5e5;
+      padding: 20px;
+      background: #ffffff;
+      display: flex;
+      gap: 12px;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #d4d4d4;
+      background: #ffffff;
+      color: #1a1a1a;
+      outline: none;
+    }
+
+    .input-area input:focus {
+      border-color: #e11d48;
+    }
+
+    .input-area button {
+      border: none;
+      padding: 0 28px;
+      border-radius: 8px;
+      background: #000000; /* Botão Preto */
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .input-area button:hover {
+      background: #e11d48; /* Hover Vermelho */
+    }
+
+    b {
+      color: #e11d48;
+    }
+    
+    .user b {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <aside class="sidebar">
+      <div class="logo-container">
+        <img src="./assets/logo_stigma.png" alt="Stigma Logo">
+        <h1>Atomação<br>Caderno de Teste</h1>
+      </div>
+
+      <div class="steps">
+        <div class="step active" id="step-1">1. Número Z</div>
+        <div class="step" id="step-2">2. Swagger</div>
+        <div class="step" id="step-3">3. Configuração</div>
+        <div class="step" id="step-4">4. Gerar Excel</div>
+      </div>
+    </aside>
+
+    <main class="chat-area">
+      <div class="chat-header">
+        <h2>Gerador de Caderno de Teste</h2>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <div class="input-area">
+        <input id="chatInput" type="text" placeholder="Digite sua resposta..." />
+        <button id="sendBtn">Enviar</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Mantive exatamente o seu script original para não quebrar a lógica do sistema
+    const messages = document.getElementById('messages');
+    const input = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    const state = {
+      step: 0,
+      zNumber: '',
+      userEmail: '',
+      swaggerFile: '',
+      endpoints: [],
+      currentEndpointIndex: 0,
+      currentField: 'url',
+      tempConfig: { url: '', summary: '' },
+      methodConfigs: []
+    };
+
+    function addMessage(content, type = 'bot') {
+      const div = document.createElement('div');
+      div.className = `message ${type}`;
+      div.innerHTML = content;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function updateStep(active) {
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`step-${i}`).classList.remove('active');
+      }
+      document.getElementById(`step-${active}`).classList.add('active');
+    }
+
+    function startChat() {
+      addMessage(`
+        👋 Bem-vindo ao portal de automação.
+        <br><br>
+        ➤ Por favor, informe seu <b>número Z</b> para começar.
+        <br><br>
+        Exemplo: <b>Z123456</b>
+      `);
+    }
+
+    async function processInput(value) {
+      addMessage(value, 'user');
+
+      if (state.step === 0) {
+        state.zNumber = value.trim().toUpperCase();
+        state.userEmail = `${state.zNumber}@claro.com.br`;
+        state.step = 1;
+        updateStep(2);
+        addMessage(`
+          ✅ Email de acesso gerado:
+          <br><br>
+          <b>${state.userEmail}</b>
+          <br><br>
+          ➤ Agora, informe o link ou caminho do <b>Swagger</b>.
+        `);
+        return;
+      }
+
+      if (state.step === 1) {
+        state.swaggerFile = value.trim();
+        addMessage(`🔍 Analisando Swagger, aguarde...`);
+        const response = await fetch('/load-swagger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ swaggerFile: state.swaggerFile })
+        });
+        const data = await response.json();
+        state.endpoints = data.endpoints;
+        state.step = 2;
+        updateStep(3);
+        askEndpointConfig();
+        return;
+      }
+
+      if (state.step === 2) {
+        const endpoint = state.endpoints[state.currentEndpointIndex];
+        if (state.currentField === 'url') {
+          state.tempConfig.url = value.trim();
+          state.currentField = 'summary';
+          addMessage(`➤ Informe o <b>ID BASE</b> para este cenário:<br><br>Exemplo: <b>API-CT-024</b>`);
+          return;
+        }
+        if (state.currentField === 'summary') {
+          state.tempConfig.summary = value.trim();
+          state.methodConfigs.push({
+            method: endpoint.method,
+            path: endpoint.path,
+            url: state.tempConfig.url,
+            summary: state.tempConfig.summary
+          });
+          state.tempConfig = { url: '', summary: '' };
+          state.currentField = 'url';
+          state.currentEndpointIndex++;
+          if (state.currentEndpointIndex >= state.endpoints.length) {
+            state.step = 3;
+            updateStep(4);
+            await generateExcel();
+            return;
+          }
+          askEndpointConfig();
+          return;
+        }
+      }
+    }
+
+    function askEndpointConfig() {
+      const endpoint = state.endpoints[state.currentEndpointIndex];
+      addMessage(`
+        <b>--- Configurando [${endpoint.method}] ---</b><br>
+        ${endpoint.path}
+        <br><br>
+        ➤ Informe a <b>URL completa</b> do endpoint:
+      `);
+    }
+
+    async function generateExcel() {
+      addMessage(`🚀 <b>Gerando sua planilha...</b><br><br>• Processando parâmetros<br>• Mapeando cenários<br>• Compilando Excel`);
+      try {
+        const response = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            swaggerFile: state.swaggerFile,
+            userEmail: state.userEmail,
+            methodConfigs: state.methodConfigs
+          })
+        });
+        if (!response.ok) throw new Error('Erro ao gerar Excel');
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Caderno_Casos_de_Testes.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        addMessage(`✅ <b>Sucesso!</b> A planilha foi gerada e o download iniciado.`);
+      } catch (error) {
+        console.error(error);
+        addMessage(`❌ Erro ao gerar o arquivo Excel.`);
+      }
+    }
+
+    sendBtn.addEventListener('click', async () => {
+      const value = input.value.trim();
+      if (!value) return;
+      input.value = '';
+      await processInput(value);
+    });
+
+    input.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+
+    startChat();
+  </script>
+</body>
+</html>
