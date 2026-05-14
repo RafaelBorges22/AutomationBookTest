@@ -1,5 +1,4 @@
 import { extractParams } from "./paramExtractor.ts";
-
 import type {
   TestScenario,
   MethodConfig,
@@ -7,33 +6,6 @@ import type {
   Operation,
   PathItem,
 } from "./types.ts";
-
-export function extractBusinessRules(
-  description: string
-): string[] {
-  if (!description) {
-    return ["Falha de validação genérica"];
-  }
-
-  const bulletLines = description
-    .split("\n")
-    .filter(
-      (line) =>
-        line.trim().startsWith("*") ||
-        line.trim().startsWith("-")
-    );
-
-  if (bulletLines.length > 0) {
-    return bulletLines.map((rule) =>
-      rule.replace(/^[*\-]\s*/, "").trim()
-    );
-  }
-
-  return [
-    description.split("\n")[0] ??
-      "Falha de validação genérica",
-  ];
-}
 
 function buildScenariosForStatus(
   statusCode: string,
@@ -45,66 +17,44 @@ function buildScenariosForStatus(
   // Cenários de sucesso (2XX)
   if (statusCode.startsWith("2")) {
     const requestExamples =
-      endpointDetails.requestBody?.content?.[
-        "application/json"
-      ]?.examples;
+      endpointDetails.requestBody?.content?.["application/json"]?.examples;
 
     if (requestExamples) {
-      for (const exampleKey of Object.keys(
-        requestExamples
-      )) {
-        scenarios.push({
-          label: "Sucesso",
-          statusCode,
-          exampleKey,
-        });
+      for (const exampleKey of Object.keys(requestExamples)) {
+        scenarios.push({ label: "Sucesso", statusCode, exampleKey });
       }
     } else {
-      scenarios.push({
-        label: "Sucesso",
-        statusCode,
-      });
+      scenarios.push({ label: "Sucesso", statusCode });
     }
-
     return scenarios;
   }
 
-  // Cenários de falha de validação
+  // Cenários de falha de validação (400/422)
   if (statusCode === "400" || statusCode === "422") {
-    const mandatoryParamsKeys =
-      Object.keys(mandatoryParamsMap);
+    const mandatoryParamsKeys = Object.keys(mandatoryParamsMap);
 
     if (mandatoryParamsKeys.length > 0) {
       for (const param of mandatoryParamsKeys) {
         const displayParam =
-          param === "__requestBody__"
-            ? "Payload Inteiro (Body)"
-            : param;
+          param === "__requestBody__" ? "Payload Inteiro (Body)" : param;
 
         scenarios.push({
           label: "Falha de Validação",
           statusCode,
-          omittedParam: displayParam,
+          omittedParam: displayParam, // Aqui entra o campo identificado com '*'
         });
       }
     } else {
       scenarios.push({
         label: "Falha (Bad Request)",
         statusCode,
-        omittedParam:
-          "Nenhum parâmetro mapeado",
+        omittedParam: "Nenhum parâmetro mapeado",
       });
     }
-
     return scenarios;
   }
 
-  // Fallback para outros erros
-  scenarios.push({
-    label: "Falha",
-    statusCode,
-  });
-
+  scenarios.push({ label: "Falha", statusCode });
   return scenarios;
 }
 
@@ -115,74 +65,37 @@ export function generateTestCases(
 ): GeneratedTestCase[] {
   const results: GeneratedTestCase[] = [];
 
-  if (!api?.paths) {
-    return results;
-  }
+  if (!api?.paths) return results;
 
-  for (const [path, methods] of Object.entries(
-    api.paths
-  )) {
+  for (const [path, methods] of Object.entries(api.paths)) {
     const pathData = methods as PathItem;
 
-    for (const [method, details] of Object.entries(
-      pathData
-    )) {
-      // Ignora propriedades que não são métodos HTTP
-      if (
-        [
-          "parameters",
-          "summary",
-          "description",
-          "servers",
-          "$ref",
-        ].includes(method)
-      ) {
-        continue;
-      }
-
-      // Proteção contra valores inválidos
-      if (
-        typeof details !== "object" ||
-        details === null
-      ) {
-        continue;
-      }
+    for (const [method, details] of Object.entries(pathData)) {
+      if (["parameters", "summary", "description", "servers", "$ref"].includes(method)) continue;
+      if (typeof details !== "object" || details === null) continue;
 
       const configKey = `${method.toUpperCase()}:${path}`;
-
-      const methodConfig =
-        methodConfigs.get(configKey);
-
-      if (!methodConfig) {
-        continue;
-      }
+      const methodConfig = methodConfigs.get(configKey);
+      if (!methodConfig) continue;
 
       const operation = details as Operation;
-
-      const endpointDesc =
-        operation.description ||
-        operation.summary ||
-        "";
-
+      const endpointDesc = operation.description || operation.summary || "";
       const responses = operation.responses || {};
+      const sortedStatusCodes = Object.keys(responses).sort();
 
-      const sortedStatusCodes =
-        Object.keys(responses).sort();
-
-      // Extração dos parâmetros obrigatórios
+      // Agora o extractParams já traz os campos com '*'
       const mandatoryParamsMap = extractParams(
+        api,
         path,
         method,
         pathData
       );
-
       for (const statusCode of sortedStatusCodes) {
-        const scenarios =
-          buildScenariosForStatus(
-            statusCode,
-            operation,
-            mandatoryParamsMap
-          );
+        const scenarios = buildScenariosForStatus(
+          statusCode,
+          operation,
+          mandatoryParamsMap
+        );
 
         for (const scenario of scenarios) {
           results.push({
@@ -191,8 +104,7 @@ export function generateTestCases(
             methodConfig,
             endpointDesc,
             userEmail,
-            mandatoryParams:
-              mandatoryParamsMap,
+            mandatoryParams: mandatoryParamsMap,
           });
         }
       }

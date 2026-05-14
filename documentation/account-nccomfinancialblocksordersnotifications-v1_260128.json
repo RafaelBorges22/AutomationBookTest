@@ -1,0 +1,627 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NC COM FINANCIAL BLOCKS ORDERS NOTIFICATIONS - (Proxy Apigee: account-nccomfinancialblocksordersnotifications-v1)",
+    "description": "<table>\n  <thead>\n    <tr>\n      <th>Version</th>\n      <th>Author</th>\n      <th>Date</th>\n      <th>Changes</th>\n    </tr>\n  </thead>  \n  <tbody>\n    <tr>\n      <td>1.0.0</td>\n      <td>Roberto Yukio Mata</td>\n      <td>2026-01-20</td>\n      <td>[Fulfillment] - Versão inicial.</td>\n    </tr>\n  </tbody>\n</table>\n\n## Objetivo\n  Callback com o resultado da solicitação de bloqueio/desbloqueio financeiro da conta do cliente por meio do sistema COM da Netcracker.\n\n\n## Público-alvo\nConsumidor será o “COM” da Netcracker.\n## Provedores\nO backend provedor da API será o MS account-cobe-financialblocksordersnotifications-v1 / Sistema COBE.\n## Contexto em que a API se Insere\nEsta API está inserida no conjunto de APIs do domínio Account e disponibiliza um método Callback com o resultado da solicitação de bloqueio/desbloqueio financeiro da conta do cliente por meio do sistema COM da Netcracker.",
+    "version": "1;2026-01-20",
+    "contact": {
+      "name": "(CC-Integração)",
+      "email": "coee.api.integracao@claro.com.br"
+    },
+    "x-claro-domains": [
+      "Account"
+    ]
+  },
+  "security": [
+    {
+      "BasicAuth": []
+    },
+    {
+      "BearerAuth": []
+    },
+    {
+      "ApiKeyAuth": []
+    },
+    {
+      "OAuth2": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api-lab.claro.com.br/account/v1",
+      "description": "Lab (SaaS)"
+    },
+    {
+      "url": "https://api-dev.claro.com.br/account/v1",
+      "description": "Dev (SaaS)"
+    },
+    {
+      "url": "https://api-test.claro.com.br/account/v1",
+      "description": "Test (SaaS)"
+    },
+    {
+      "url": "https://api-sandbox.claro.com.br/account/v1",
+      "description": "Sandbox (SaaS)"
+    },
+    {
+      "url": "https://api-homolog.claro.com.br/account/v1",
+      "description": "Homologação (SaaS)"
+    },
+    {
+      "url": "https://api.claro.com.br/account/v1",
+      "description": "Produção (SaaS)"
+    },
+    {
+      "url": "https://lab.apigw.claro.com.br/account/v1",
+      "description": "Lab (OPDK)"
+    },
+    {
+      "url": "https://dev.apigw.claro.com.br/account/v1",
+      "description": "Dev (OPDK)"
+    },
+    {
+      "url": "https://test.apigw.claro.com.br/test06/account/v1",
+      "description": "Test (OPDK)"
+    },
+    {
+      "url": "https://cas.apigw.claro.com.br/account/v1",
+      "description": "Produção (OPDK Campinas)"
+    },
+    {
+      "url": "https://lpa.apigw.claro.com.br/account/v1",
+      "description": "Produção (OPDK Lapa)"
+    }
+  ],
+  "paths": {
+    "/nc/com/financialblocks/orders/notifications": {
+      "post": {
+        "summary": "Enviar callback com o resultado do bloqueio ou desbloqueio financeiro da conta do cliente backend: MS account-cobe-financialblocksordersnotifications-v1",
+        "operationId": "financialBlocksOrdersNotifications",
+        "tags": [
+          "Financial Blocks Orders Notifications"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinancialBlocksNotificationsRequest"
+              },
+                "examples": {
+                    "Sucesso": {
+                        "summary": "Exemplo Callback Sucesso",
+                        "value": {
+                            "data": {
+                                "correlationId": "4c04bdc2-7130-46ed-8533-0c650b3c17a5",
+                                "order":{
+                                    "results": [
+                                        {
+                                            "designationId": "SBO/IP/04567",
+                                            "status": "SUCCESS",
+                                            "billingRequestCompletionDate": "2025-11-24",
+                                            "networkRequestCompletionDate": "2025-11-25"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "Erro": {
+                        "summary": "Exemplo Callback Erro",
+                        "value": {
+                            "data": {
+                                "correlationId": "4c04bdc2-7130-46ed-8533-0c650b3c17a5",
+                                "order":{
+                                    "results": [
+                                        {
+                                            "designationId": "SBO/IP/04567",
+                                            "status": "ERROR",
+                                            "billingRequestCompletionDate": "2025-11-24",
+                                            "networkRequestCompletionDate": "2025-11-25",
+                                            "error": {
+                                                "date": "2025-11-22",
+                                                "code": "ERR-010",
+                                                "message": "Unknown designation id"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SucessResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Client-Key"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth2/v1/token",
+            "scopes": {}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "FinancialBlocksNotificationsRequest": {
+        "type": "object",
+        "description": "Estrutura enviada para solicitando ação de bloqueio/desbloqueio.",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "required": [
+              "correlationId",
+              "results"
+            ],
+            "properties": {
+              "correlationId": {
+                "type": "string",
+                "description": "ID da transação",
+                "example": "4c04bdc2-7130-46ed-8533-0c650b3c17a5"
+              },
+              "order": {
+                "properties": {
+                  "results": {
+                    "type": "array",
+                    "description": "Array de resultados, contendo uma entrada para cada designação processada. ",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "designationId": {
+                          "type": "string",
+                          "description": "Designação do serviço bloqueado / desbloqueado",
+                          "example": "SBO/IP/02163"
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "Status do processamento. Valores possíveis: 'SUCCESS' ou 'ERROR'",
+                          "example": "SUCCESS"
+                        },
+                        "billingRequestCompletionDate": {
+                          "type": "string",
+                          "description": "Data em que o bloqueio/desbloqueio de cobrança foi processada no FDS",
+                          "example": "2025-11-24"
+                        },
+                        "networkRequestCompletionDate": {
+                          "type": "string",
+                          "description": "Data em que a rede bloqueou/desbloqueou o serviço",
+                          "example": "2025-11-25"
+                        },
+                        "error": {
+                          "properties": {
+                            "date": {
+                              "type": "string",
+                              "description": "Data do erro de processo, caso status == 'ERROR'",
+                              "example": "2025-11-22"
+                            },
+                            "code": {
+                              "type": "string",
+                              "description": "Código do erro, caso status == 'ERROR'",
+                              "example": "ERR-010"
+                            },
+                            "message": {
+                              "type": "string",
+                              "description": "Mensagem do erro, caso status == 'ERROR' ",
+                              "example": "Unknown designation id"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "FinancialBlocksNotificationsResponse": {
+        "type": "object",
+        "description": "Registro salvo na tabela de relatório.",
+        "required": [
+          "apiVersion",
+          "transactionId",
+          "data"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2026-01-20”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "1;2026-01-20"
+          },
+          "transactionId": {
+            "type": "string",
+            "example": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API."
+          }
+        }
+      },
+      "errorNotificationsResponse": {
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “1;2026-01-20”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "1;2026-01-20"
+          },
+          "transactionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "b6195102-ea4f-44e8-fed5-386e4ec2a373"
+          },
+          "error": {
+            "type": "object",
+            "description": "Detalhes do erro ocorrido.",
+            "properties": {
+              "httpCode": {
+                "type": "string",
+                "description": "Código HTTP em formato string.",
+                "example": "400"
+              },
+              "errorCode": {
+                "type": "string",
+                "description": "Código interno da API para o erro.",
+                "example": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-400"
+              },
+              "message": {
+                "type": "string",
+                "description": "Mensagem resumida do erro.",
+                "example": "Bad Request."
+              },
+              "detailedMessage": {
+                "type": "string",
+                "description": "Mensagem detalhada do erro.",
+                "example": "Bad Request."
+              },
+              "link": {
+                "type": "object",
+                "description": "Link relacionado ao erro.",
+                "properties": {
+                  "rel": {
+                    "type": "string",
+                    "description": "Relação do link com o recurso.",
+                    "example": "related"
+                  },
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL para documentação ou recurso relacionado.",
+                    "example": "https://api.com.br/docs"
+                  }
+                },
+                "required": [
+                  "rel",
+                  "href"
+                ]
+              }
+            },
+            "required": [
+              "httpCode",
+              "errorCode",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "apiVersion",
+          "transactionId",
+          "error"
+        ]
+      }
+    },
+    "responses": {
+      "SucessResponse": {
+        "description": "Sucess",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/FinancialBlocksNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373"
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "400",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-400",
+                "message": "Bad Request.",
+                "detailedMessage": "Bad Request.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "401",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-401",
+                "message": "Unauthorized",
+                "detailedMessage": "Unauthorized User",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "403",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-403",
+                "message": "Forbidden",
+                "detailedMessage": "Access denied.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "404",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-404",
+                "message": "Not found",
+                "detailedMessage": "Resource not found",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "MethodNotAllowed": {
+        "description": "Method Not Allowed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "405",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-405",
+                "message": "Method Not Allowed",
+                "detailedMessage": "Unavailable HTTP method",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotAcceptable": {
+        "description": "Request Not Acceptable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "406",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-406",
+                "message": "Request Not Acceptable",
+                "detailedMessage": "Requested content type not acceptable",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnsupportedMediaType": {
+        "description": "Unsupported Media Type",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "415",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-415",
+                "message": "Unsupported Media Type",
+                "detailedMessage": "Unsupported request media type",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "429",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-429",
+                "message": "Too Many Requests",
+                "detailedMessage": "Consumer requests exceeded policies",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "500",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-500",
+                "message": "Internal Server Error",
+                "detailedMessage": "Internal server error",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServiceUnavailable": {
+        "description": "Service Unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorNotificationsResponse"
+            },
+            "example": {
+              "apiVersion": "1;2026-01-20",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "503",
+                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERSNOTIFICATIONS-503",
+                "message": "Service Unavailable",
+                "detailedMessage": "Service Unavailable",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

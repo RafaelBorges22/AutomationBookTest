@@ -3,83 +3,136 @@ import type {
   Parameter,
   Operation,
   MandatoryParam,
-  TestScenario,
-  MethodConfig,
-  GeneratedTestCase,
+  OpenAPISchema,
 } from "./types.ts";
 
-/**
- * Retorna apenas os parâmetros obrigatórios.
- */
-export function extractParamRequired(
-  parameters: Parameter[] = []
-): Parameter[] {
-  return parameters.filter(
-    (param) => param.required
-  );
+export function extractParamRequired(parameters: Parameter[] = []): Parameter[] {
+  return parameters.filter((param) => param.required);
 }
 
 /**
- * Extrai regras de negócio da descrição.
+ * Resolve referências do swagger (#/components/schemas/...)
  */
-export function extractBusinessRules(
-  description: string
-): string[] {
-  if (!description) {
-    return ["Falha de validação genérica"];
+function resolveRef(ref: string, api: any): OpenAPISchema | null {
+  const refPath = ref.replace("#/", "").split("/");
+  let current: any = api;
+
+  for (const part of refPath) {
+    current = current?.[part];
   }
 
-  const bulletLines = description
-    .split("\n")
-    .filter(
-      (line) =>
-        line.trim().startsWith("*") ||
-        line.trim().startsWith("-")
-    );
-
-  if (bulletLines.length > 0) {
-    return bulletLines.map((rule) =>
-      rule.replace(/^[*\-]\s*/, "").trim()
-    );
-  }
-
-  return [
-    description.split("\n")[0] ??
-      "Falha de validação genérica",
-  ];
+  return current || null;
 }
 
 /**
- * Extrai parâmetros obrigatórios do endpoint.
+ * Percorre o schema em cascata identificando TODOS
+ * os parâmetros obrigatórios através do array "required"
  */
+function walkSchema(
+  schema: OpenAPISchema,
+  api: any,
+  parentPath = "",
+  acc: Record<string, MandatoryParam> = {}
+): Record<string, MandatoryParam> {
+  if (!schema) return acc;
+
+  /**
+   * Resolve $ref
+   */
+  if ((schema as any).$ref) {
+    const resolved = resolveRef((schema as any).$ref, api);
+
+    if (resolved) {
+      walkSchema(resolved, api, parentPath, acc);
+    }
+
+    return acc;
+  }
+
+  const requiredFields = schema.required || [];
+
+  if (!schema.properties) return acc;
+
+  for (const [key, propRaw] of Object.entries(schema.properties)) {
+    let prop: any = propRaw;
+
+    /**
+     * Resolve $ref da propriedade
+     */
+    if (prop.$ref) {
+      const resolved = resolveRef(prop.$ref, api);
+
+      if (resolved) {
+        prop = resolved;
+      }
+    }
+
+    const currentPath = parentPath
+      ? `${parentPath}.${key}`
+      : key;
+
+    /**
+     * Campo obrigatório
+     */
+    if (requiredFields.includes(key)) {
+      acc[currentPath] = {
+        name: currentPath,
+        in: "body",
+        required: true,
+        description: prop.description || "",
+      };
+    }
+
+    /**
+     * Objeto
+     */
+    if (prop.type === "object") {
+      walkSchema(prop, api, currentPath, acc);
+    }
+
+    /**
+     * Array de objetos
+     */
+    if (
+      prop.type === "array" &&
+      prop.items
+    ) {
+      walkSchema(
+        prop.items,
+        api,
+        `${currentPath}[]`,
+        acc
+      );
+    }
+  }
+
+  return acc;
+}
+
 export function extractParams(
+  api: any,
   path: string,
   method: string,
   pathData: PathItem
 ): Record<string, MandatoryParam> {
-  const mandatoryParams: Record<
-    string,
-    MandatoryParam
-  > = {};
+  const mandatoryParams: Record<string, MandatoryParam> = {};
 
   const operation =
     pathData[
       method.toLowerCase() as keyof PathItem
     ] as Operation;
 
-  if (!operation) {
-    return mandatoryParams;
-  }
+  if (!operation) return mandatoryParams;
 
+  /**
+   * Query / Header / Path params
+   */
   const allParams: Parameter[] = [
     ...(pathData.parameters || []),
     ...(operation.parameters || []),
   ];
 
-  const requiredParams =
-    extractParamRequired(allParams);
-
-  for (const param of requiredParams) {
+  for (const param of extractParamRequired(allParams)) {
     mandatoryParams[param.name] = {
       name: param.name,
       in: param.in,
@@ -87,185 +140,22 @@ export function extractParams(
     };
   }
 
-  // OpenAPI 3 - Request Body obrigatório
-  if (operation.requestBody?.required) {
-    mandatoryParams["__requestBody__"] = {
-      name: "__requestBody__",
-      in: "body",
-      required: true,
-    };
+  /**
+   * Request Body
+   */
+  const content =
+    operation.requestBody?.content?.[
+      "application/json"
+    ];
+
+  if (content?.schema) {
+    walkSchema(
+      content.schema,
+      api,
+      "",
+      mandatoryParams
+    );
   }
 
   return mandatoryParams;
-}
-
-/**
- * Monta cenários por status code.
- */
-function buildScenariosForStatus(
-  statusCode: string,
-  endpointDetails: Operation,
-  mandatoryParamsKeys: string[]
-): TestScenario[] {
-  const scenarios: TestScenario[] = [];
-
-  // Sucesso
-  if (statusCode.startsWith("2")) {
-    const requestExamples =
-      endpointDetails.requestBody?.content?.[
-        "application/json"
-      ]?.examples;
-
-    if (requestExamples) {
-      for (const exampleKey of Object.keys(
-        requestExamples
-      )) {
-        scenarios.push({
-          label: "Sucesso",
-          statusCode,
-          exampleKey,
-        });
-      }
-    } else {
-      scenarios.push({
-        label: "Sucesso",
-        statusCode,
-      });
-    }
-
-    return scenarios;
-  }
-
-  // Falha de validação
-  if (statusCode === "400" || statusCode === "422") {
-    if (mandatoryParamsKeys.length > 0) {
-      for (const param of mandatoryParamsKeys) {
-        const displayParam =
-          param === "__requestBody__"
-            ? "Payload Inteiro (Body)"
-            : param;
-
-        scenarios.push({
-          label: "Falha de Validação",
-          statusCode,
-          omittedParam: displayParam,
-        });
-      }
-    } else {
-      scenarios.push({
-        label: "Falha (Bad Request)",
-        statusCode,
-        omittedParam:
-          "Nenhum parametro mapeado",
-      });
-    }
-
-    return scenarios;
-  }
-
-  // Outros erros
-  scenarios.push({
-    label: "Falha",
-    statusCode,
-  });
-
-  return scenarios;
-}
-
-/**
- * Geração principal dos casos de teste.
- */
-export function generateTestCases(
-  api: any,
-  methodConfigs: Map<string, MethodConfig>,
-  userEmail: string
-): GeneratedTestCase[] {
-  const results: GeneratedTestCase[] = [];
-
-  if (!api?.paths) {
-    return results;
-  }
-
-  for (const [path, methods] of Object.entries(
-    api.paths
-  )) {
-    const pathData = methods as PathItem;
-
-    for (const [method, details] of Object.entries(
-      pathData
-    )) {
-      // Ignora propriedades inválidas
-      if (
-        [
-          "parameters",
-          "summary",
-          "description",
-          "servers",
-          "$ref",
-        ].includes(method)
-      ) {
-        continue;
-      }
-
-      if (
-        typeof details !== "object" ||
-        details === null
-      ) {
-        continue;
-      }
-
-      const configKey = `${method.toUpperCase()}:${path}`;
-
-      const methodConfig =
-        methodConfigs.get(configKey);
-
-      if (!methodConfig) {
-        continue;
-      }
-
-      const operation = details as Operation;
-
-      const endpointDesc =
-        operation.description ||
-        operation.summary ||
-        "";
-
-      const responses = operation.responses || {};
-
-      const sortedStatusCodes =
-        Object.keys(responses).sort();
-
-      const mandatoryParamsMap = extractParams(
-        path,
-        method,
-        pathData
-      );
-
-      const mandatoryParamsKeys =
-        Object.keys(mandatoryParamsMap);
-
-      for (const statusCode of sortedStatusCodes) {
-        const scenarios =
-          buildScenariosForStatus(
-            statusCode,
-            operation,
-            mandatoryParamsKeys
-          );
-
-        for (const scenario of scenarios) {
-          results.push({
-            ctFormatado: methodConfig.summary,
-            scenario,
-            methodConfig,
-            endpointDesc,
-            userEmail,
-            mandatoryParams:
-              mandatoryParamsMap,
-          });
-        }
-      }
-    }
-  }
-
-  return results;
 }
