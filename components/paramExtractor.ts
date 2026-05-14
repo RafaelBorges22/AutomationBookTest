@@ -1,60 +1,161 @@
-import type { MandatoryParam } from "./types.ts";
+import type {
+  PathItem,
+  Parameter,
+  Operation,
+  MandatoryParam,
+  OpenAPISchema,
+} from "./types.ts";
 
-/**
- * Recursively walks a JSON Schema object and collects every field
- * marked as required, building dot-notation paths for nested objects
- * and bracket notation for arrays.
- */
-export function getBodyMandatoryParams(schema: any, parentPath = ""): MandatoryParam[] {
-  const mandatory: MandatoryParam[] = [];
-  if (!schema) return mandatory;
-
-  // 1. Collect required fields at the current level
-  if (schema.required && Array.isArray(schema.required)) {
-    for (const reqField of schema.required as string[]) {
-const fullPath = parentPath ? `${parentPath}.${reqField}` : reqField;
-      mandatory.push({ name: fullPath, in: "body" });
-    }
-  }
-
-  // 2. Recurse into child object properties
-  if (schema.properties) {
-    for (const [propName, propSchema] of Object.entries(schema.properties as Record<string, any>)) {
-      const newPath = parentPath ? `${parentPath}.${propName}.` : `${propName}.`;
-      mandatory.push(...getBodyMandatoryParams(propSchema, newPath));
-    }
-  }
-
-  // 3. Recurse into array item schemas
-  if (schema.type === "array" && schema.items) {
-    mandatory.push(...getBodyMandatoryParams(schema.items, parentPath + "[0]."));
-  }
-
-  return mandatory;
+export function extractParamRequired(parameters: Parameter[] = []): Parameter[] {
+  return parameters.filter((param) => param.required);
 }
 
 /**
- * Collects all mandatory parameters for an endpoint:
- *  - header / query / path parameters
- *  - deeply nested request body fields
+ * Resolve referências do swagger (#/components/schemas/...)
  */
-export function getMandatoryParameters(details: any): MandatoryParam[] {
-  const mandatory: MandatoryParam[] = [];
+function resolveRef(ref: string, api: any): OpenAPISchema | null {
+  const refPath = ref.replace("#/", "").split("/");
+  let current: any = api;
 
-  // A. Header, query and path params
-  if (details.parameters && Array.isArray(details.parameters)) {
-    for (const param of details.parameters) {
-      if (param.required) {
-        mandatory.push({ name: param.name, in: param.in });
+  for (const part of refPath) {
+    current = current?.[part];
+  }
+
+  return current || null;
+}
+
+/**
+ * Percorre o schema em cascata identificando TODOS
+ * os parâmetros obrigatórios através do array "required"
+ */
+function walkSchema(
+  schema: OpenAPISchema,
+  api: any,
+  parentPath = "",
+  acc: Record<string, MandatoryParam> = {}
+): Record<string, MandatoryParam> {
+  if (!schema) return acc;
+
+  /**
+   * Resolve $ref
+   */
+  if ((schema as any).$ref) {
+    const resolved = resolveRef((schema as any).$ref, api);
+
+    if (resolved) {
+      walkSchema(resolved, api, parentPath, acc);
+    }
+
+    return acc;
+  }
+
+  const requiredFields = schema.required || [];
+
+  if (!schema.properties) return acc;
+
+  for (const [key, propRaw] of Object.entries(schema.properties)) {
+    let prop: any = propRaw;
+
+    /**
+     * Resolve $ref da propriedade
+     */
+    if (prop.$ref) {
+      const resolved = resolveRef(prop.$ref, api);
+
+      if (resolved) {
+        prop = resolved;
       }
+    }
+
+    const currentPath = parentPath
+      ? `${parentPath}.${key}`
+      : key;
+
+    /**
+     * Campo obrigatório
+     */
+    if (requiredFields.includes(key)) {
+      acc[currentPath] = {
+        name: currentPath,
+        in: "body",
+        required: true,
+        description: prop.description || "",
+      };
+    }
+
+    /**
+     * Objeto
+     */
+    if (prop.type === "object") {
+      walkSchema(prop, api, currentPath, acc);
+    }
+
+    /**
+     * Array de objetos
+     */
+    if (
+      prop.type === "array" &&
+      prop.items
+    ) {
+      walkSchema(
+        prop.items,
+        api,
+        `${currentPath}[]`,
+        acc
+      );
     }
   }
 
-  // B. Recursively extracted body fields
-  const bodySchema = details.requestBody?.content?.["application/json"]?.schema;
-  if (bodySchema) {
-    mandatory.push(...getBodyMandatoryParams(bodySchema, ""));
+  return acc;
+}
+
+export function extractParams(
+  api: any,
+  path: string,
+  method: string,
+  pathData: PathItem
+): Record<string, MandatoryParam> {
+  const mandatoryParams: Record<string, MandatoryParam> = {};
+
+  const operation =
+    pathData[
+      method.toLowerCase() as keyof PathItem
+    ] as Operation;
+
+  if (!operation) return mandatoryParams;
+
+  /**
+   * Query / Header / Path params
+   */
+  const allParams: Parameter[] = [
+    ...(pathData.parameters || []),
+    ...(operation.parameters || []),
+  ];
+
+  for (const param of extractParamRequired(allParams)) {
+    mandatoryParams[param.name] = {
+      name: param.name,
+      in: param.in,
+      required: true,
+    };
   }
 
-  return mandatory;
+  /**
+   * Request Body
+   */
+  const content =
+    operation.requestBody?.content?.[
+      "application/json"
+    ];
+
+  if (content?.schema) {
+    walkSchema(
+      content.schema,
+      api,
+      "",
+      mandatoryParams
+    );
+  }
+
+  return mandatoryParams;
 }
