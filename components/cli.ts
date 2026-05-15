@@ -84,27 +84,26 @@ async function extractRequestBodyFromSwagger(
   }
 }
 
+// No cli.ts, dentro de askUserInputs():
+
 export async function askUserInputs(): Promise<UserInputs> {
   const iface = getInterface();
 
-  const zInput = await iface.question(
-    "➤ Qual o seu número Z (ex: Z123456)? "
-  );
-
+  const zInput = await iface.question("➤ Qual o seu número Z (ex: Z123456)? ");
   const zNumber = zInput.trim().toUpperCase();
-
   const userEmail = `${zNumber}@claro.com.br`;
 
-  const fileInput = await iface.question(
-    "➤ Digite o nome do arquivo Swagger (ex: mobile.json): "
-  );
+  // --- NOVA PERGUNTA ---
+  const productAreas = await iface.question("➤ Digite o Product Areas (ex: Canais Digitais): ");
 
+  const fileInput = await iface.question("➤ Digite o nome do arquivo Swagger (ex: mobile.json): ");
   const swaggerFilePath = `./documentation/${fileInput.trim()}`;
 
   return {
     zNumber,
     userEmail,
     swaggerFilePath,
+    productAreas: productAreas.trim(),
   };
 }
 
