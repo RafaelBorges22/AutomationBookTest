@@ -1,0 +1,838 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Customer - NCCIP - Customers Contracts (Proxy Apigee: customers-nccipcustomerscontracts-v1)",
+        "description": "<table>\n  <thead>\n    <tr>\n      <th>Version</th>\n      <th>Author</th>\n      <th>Date</th>\n      <th>Changes</th>\n    </tr>\n  </thead>  \n  <tbody>\n    <tr>\n      <td>1.0.0</td>\n      <td>Roberto Yukio Mata</td>\n      <td>2026-02-19</td>\n      <td>[Fulfillment] - Versão inicial.</td>\n    </tr>\n  </tbody>\n</table>\n\n## Objetivo\nConsulta de dados de contratos do cliente, provenientes do IBS, do COM e do CPQ, unificados por meio da plataforma Netcracker CIP (Cloud Integration Platform).\n## Público-alvo\nConsumidor será o SIR.\n## Provedores\nO backend provedor da API será o Netcracker CIP (Cloud Integration Platform).\n## Contexto em que a API se insere\nSIR é o Sistema usado pela Claro para registrar reclamações ('rec' ou 'recuperação') relacionados a problemas no serviço.\n\nO fluxo de integração principal entre o SIR e a NetCracker vai ser durante o registro de reclamações. O SIR precisa identificar o assinante e validar o designationId na NC e sendo válido, o NC CIP retorna um conjunto de informações do cliente.",
+        "version": "1;2026-02-19",
+        "contact": {
+            "name": "CC-Integração",
+            "email": "coee.api.integracao@claro.com.br"
+        },
+        "x-claro-domains": [
+            "Customer"
+        ]
+    },
+    "security": [
+        {
+            "BasicAuth": [
+            ]
+        },
+        {
+            "BearerAuth": [
+            ]
+        },
+        {
+            "ApiKeyAuth": [
+            ]
+        },
+        {
+            "OAuth2": [
+            ]
+        }
+    ],
+    "servers": [
+        {
+            "url": "https://api-lab.claro.com.br/customers/v1",
+            "description": "Lab (SaaS)"
+        },
+        {
+            "url": "https://api-dev.claro.com.br/customers/v1",
+            "description": "Dev (SaaS)"
+        },
+        {
+            "url": "https://api-test.claro.com.br/customers/v1",
+            "description": "Test (SaaS)"
+        },
+        {
+            "url": "https://api-sandbox.claro.com.br/customers/v1",
+            "description": "Sandbox (SaaS)"
+        },
+        {
+            "url": "https://api-homolog.claro.com.br/customers/v1",
+            "description": "Homologação (SaaS)"
+        },
+        {
+            "url": "https://api.claro.com.br/customers/v1",
+            "description": "Produção (SaaS)"
+        },
+        {
+            "url": "https://lab.apigw.claro.com.br/customers/v1",
+            "description": "Lab (OPDK)"
+        },
+        {
+            "url": "https://dev.apigw.claro.com.br/customers/v1",
+            "description": "Dev (OPDK)"
+        },
+        {
+            "url": "https://test.apigw.claro.com.br/test06/customers/v1",
+            "description": "Test (OPDK)"
+        },
+        {
+            "url": "https://cas.apigw.claro.com.br/customers/v1",
+            "description": "Produção (OPDK Campinas)"
+        },
+        {
+            "url": "https://lpa.apigw.claro.com.br/customers/v1",
+            "description": "Produção (OPDK Lapa)"
+        }
+    ],
+    "paths": {
+        "/nc/cip/customers/contracts": {
+            "get": {
+                "summary": "Consultar dados de contratos do cliente, provenientes do IBS, do COM e do CPQ.  Backend: NC CIP - Cloud Integration Platform",
+                "operationId": "getCustomerContracts",
+                "tags": [
+                    "Customer Contracts"
+                ],
+                "parameters": [
+                    {
+                        "name": "designationId",
+                        "in": "query",
+                        "required": true,
+                        "description": "Designação do serviço recebida na request",
+                        "schema": {
+                            "type": "string",
+                            "example": "SBO/IP/02163"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Consulta realizada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Contract"
+                                },
+                                "example": {
+                                    "apiVersion": "1;2026-02-19",
+                                    "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                                    "data": {
+                                        "contract": {
+                                            "designationId": "SBO/IP/02163",
+                                            "activationDate": "19/02/2026",
+                                            "cleAccountId": "12345678901-0001",
+                                            "grcActive": "Sim",
+                                            "product": {
+                                                "sirProductCode": "0280",
+                                                "vendor": "Vendor",
+                                                "fgNationalInternationalInstance": "N"
+                                            },
+                                            "technicalContact": {
+                                                "phoneNumber": "11987654321"
+                                            },
+                                            "installationAddress": {
+                                                "streetType": "Rua",
+                                                "streetName": "das Flores",
+                                                "number": "123",
+                                                "additionalInformation": "Apto 45, Bloco B",
+                                                "district": "Centro",
+                                                "zipCode": "13200-000",
+                                                "city": "Jundiaí",
+                                                "state": "São Paulo",
+                                                "acronym": "SP",
+                                                "addressTypeIndicator": "2",
+                                                "locationCode": "3550308123456"
+                                            },
+                                            "cpes": [
+                                                {
+                                                    "id": "1",
+                                                    "wans": [
+                                                        {
+                                                            "id": "1",
+                                                            "connectivityDesignation": "WAN1-CPE"
+                                                        },
+                                                        {
+                                                            "id": "2",
+                                                            "connectivityDesignation": "WAN2-CPE"
+                                                        },
+                                                        {
+                                                            "id": "3",
+                                                            "connectivityDesignation": "WAN3-CPE"
+                                                        },
+                                                        {
+                                                            "id": "4",
+                                                            "connectivityDesignation": "WAN4-CPE"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "2",
+                                                    "wans": [
+                                                        {
+                                                            "id": "1",
+                                                            "connectivityDesignation": "WAN1-CPE"
+                                                        },
+                                                        {
+                                                            "id": "2",
+                                                            "connectivityDesignation": "WAN2-CPE"
+                                                        },
+                                                        {
+                                                            "id": "3",
+                                                            "connectivityDesignation": "WAN3-CPE"
+                                                        },
+                                                        {
+                                                            "id": "4",
+                                                            "connectivityDesignation": "WAN4-CPE"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "405": {
+                        "$ref": "#/components/responses/MethodNotAllowed"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptable"
+                    },
+                    "415": {
+                        "$ref": "#/components/responses/UnsupportedMediaType"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/UnprocessableEntity"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/ServiceUnavailable"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "BasicAuth": {
+                "type": "http",
+                "scheme": "basic"
+            },
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            },
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Client-Key"
+            },
+            "OAuth2": {
+                "type": "oauth2",
+                "flows": {
+                    "clientCredentials": {
+                        "tokenUrl": "/oauth2/v1/token",
+                        "scopes": {
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "Contract": {
+                "type": "object",
+                "required": [
+                    "apiVersion",
+                    "transactionId",
+                    "data"
+                ],
+                "properties": {
+                    "apiVersion": {
+                        "type": "string",
+                        "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2021-06-19”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+                        "example": "1;2026-02-19"
+                    },
+                    "transactionId": {
+                        "type": "string",
+                        "example": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                        "description": "Retorna o identificador de rastreabilidade de transação gerado pela API."
+                    },
+                    "data": {
+                        "type": "object",
+                        "properties": {
+                            "contract": {
+                                "type": "object",
+                                "description": "Dados contratuais unificados (IBS/COM)",
+                                "properties": {
+                                    "designationId": {
+                                        "type": "string",
+                                        "description": "Designação do serviço",
+                                        "example": "SBO/IP/02163"
+                                    },
+                                    "activationDate": {
+                                        "type": "string",
+                                        "description": "Data de ativação do contrato DD/MM/YYYY",
+                                        "example": "19/02/2026"
+                                    },
+                                    "cleAccountId": {
+                                        "type": "string",
+                                        "description": "CLE account",
+                                        "example": "12345678901-0001"
+                                    },
+                                    "grcActive": {
+                                        "type": "string",
+                                        "description": "Indica se o GRC está ativo em qualquer uma das portas WAN.",
+                                        "example": "Sim"
+                                    },
+                                    "product": {
+                                        "type": "object",
+                                        "description": "Informações do produto SIR",
+                                        "properties": {
+                                            "sirProductCode": {
+                                                "type": "string",
+                                                "description": "Código do produto específico do SIR",
+                                                "example": "0280"
+                                            },
+                                            "vendor": {
+                                                "type": "string",
+                                                "description": "Vendor",
+                                                "example": "Vendor"
+                                            },
+                                            "fgNationalInternationalInstance": {
+                                                "type": "string",
+                                                "description": "N – indica que todas as instâncias são nacionais",
+                                                "example": "N"
+                                            }
+                                        }
+                                    },
+                                    "technicalContact": {
+                                        "type": "object",
+                                        "description": "Contato técnico do cliente",
+                                        "properties": {
+                                            "phoneNumber": {
+                                                "type": "string",
+                                                "description": "Telefone do contato técnico do cliente",
+                                                "example": "11987654321"
+                                            }
+                                        }
+                                    },
+                                    "installationAddress": {
+                                        "type": "object",
+                                        "description": "Endereço da instalação do contrato",
+                                        "properties": {
+                                            "streetType": {
+                                                "type": "string",
+                                                "description": "Tipo do logradouro (ex.: Rua, Avenida, Alameda, Travessa).",
+                                                "example": "Rua"
+                                            },
+                                            "streetName": {
+                                                "type": "string",
+                                                "description": "Nome do logradouro, sem o tipo.",
+                                                "example": "das Flores"
+                                            },
+                                            "number": {
+                                                "type": "string",
+                                                "description": "Número do imóvel no logradouro.",
+                                                "example": "123"
+                                            },
+                                            "additionalInformation": {
+                                                "type": "string",
+                                                "description": "Complemento do endereço, como bloco, apartamento, sala ou referência adicional.",
+                                                "example": "Apto 45, Bloco B"
+                                            },
+                                            "district": {
+                                                "type": "string",
+                                                "description": "Bairro onde o imóvel está localizado.",
+                                                "example": "Centro"
+                                            },
+                                            "zipCode": {
+                                                "type": "string",
+                                                "description": "Código de Endereçamento Postal (CEP).",
+                                                "example": "13200-000"
+                                            },
+                                            "city": {
+                                                "type": "string",
+                                                "description": "Nome do município.",
+                                                "example": "Jundiaí"
+                                            },
+                                            "state": {
+                                                "type": "string",
+                                                "description": "Nome completo do estado.",
+                                                "example": "São Paulo"
+                                            },
+                                            "acronym": {
+                                                "type": "string",
+                                                "description": "Sigla da unidade federativa (UF).",
+                                                "example": "SP"
+                                            },
+                                            "addressTypeIndicator": {
+                                                "type": "string",
+                                                "description": "Fixo “2” – tipo da instalação no site do cliente",
+                                                "example": "2"
+                                            },
+                                            "locationCode": {
+                                                "type": "string",
+                                                "description": "Código CNL (Código Nacional de Logradouro) utilizado para identificação padronizada do endereço.",
+                                                "example": "3550308123456"
+                                            }
+                                        }
+                                    },
+                                    "cpes": {
+                                        "type": "array",
+                                        "description": "Lista de CPEs do contrato, cada um com a sua lista de WANS.",
+                                        "items": {
+                                            "$ref": "#/components/schemas/Cpe"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Cpe": {
+                "type": "object",
+                "description": "CPE com sua lista de WANS.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador do CPE.",
+                        "example": "1"
+                    },
+                    "wans": {
+                        "type": "array",
+                        "description": "Lista de conectividades WAN associadas ao CPE.",
+                        "items": {
+                            "$ref": "#/components/schemas/Wan"
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "wans"
+                ]
+            },
+            "Wan": {
+                "type": "object",
+                "description": "Estrutura padrão de conectividade WAN por CPE",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador da WAN.",
+                        "example": "1"
+                    },
+                    "connectivityDesignation": {
+                        "type": "string",
+                        "description": "Designação da conectividade WAN.",
+                        "example": "WAN1-CPE"
+                    }
+                },
+                "required": [
+                    "id",
+                    "connectivityDesignation"
+                ]
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "required": [
+                    "apiVersion",
+                    "transactionId",
+                    "error"
+                ],
+                "properties": {
+                    "apiVersion": {
+                        "type": "string",
+                        "example": "1;2026-02-27"
+                    },
+                    "transactionId": {
+                        "type": "string",
+                        "example": "b6195102-ea4f-44e8-fed5-386e4ec2a373"
+                    },
+                    "error": {
+                        "type": "object",
+                        "description": "Detalhes do erro ocorrido",
+                        "properties": {
+                            "httpCode": {
+                                "type": "string",
+                                "description": "Código HTTP em formato string",
+                                "example": "400"
+                            },
+                            "errorCode": {
+                                "type": "string",
+                                "description": "Código interno da API para o erro",
+                                "example": "API-NCCIPCUSTOMERSCONTRACTS-400"
+                            },
+                            "message": {
+                                "type": "string",
+                                "description": "Mensagem resumida do erro",
+                                "example": "Bad Request."
+                            },
+                            "detailedMessage": {
+                                "type": "string",
+                                "description": "Mensagem detalhada do erro",
+                                "example": "Bad Request."
+                            },
+                            "link": {
+                                "type": "object",
+                                "description": "Link relacionado ao erro",
+                                "properties": {
+                                    "rel": {
+                                        "type": "string",
+                                        "description": "Relação do link com o recurso",
+                                        "example": "related"
+                                    },
+                                    "href": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "description": "URL para documentação ou recurso relacionado",
+                                        "example": "https://api.claro.com.br/docs"
+                                    }
+                                },
+                                "required": [
+                                    "rel",
+                                    "href"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "httpCode",
+                            "errorCode",
+                            "message"
+                        ]
+                    }
+                }
+            }
+        },
+        "responses": {
+            "BadRequest": {
+                "description": "Bad Request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "400",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-400",
+                                "message": "Bad Request.",
+                                "detailedMessage": "Bad Request.",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Unauthorized": {
+                "description": "Unauthorized",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "401",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-401",
+                                "message": "Unauthorized",
+                                "detailedMessage": "Unauthorized User",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "Forbidden",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "403",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-403",
+                                "message": "Forbidden",
+                                "detailedMessage": "Access denied.",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "404",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-404",
+                                "message": "Not found",
+                                "detailedMessage": "Resource not found",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "MethodNotAllowed": {
+                "description": "Method Not Allowed",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "405",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-405",
+                                "message": "Method Not Allowed",
+                                "detailedMessage": "Unavailable HTTP method",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "NotAcceptable": {
+                "description": "Request Not Acceptable",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "406",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-406",
+                                "message": "Request Not Acceptable",
+                                "detailedMessage": "Requested content type not acceptable",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "UnsupportedMediaType": {
+                "description": "Unsupported Media Type",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "415",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-415",
+                                "message": "Unsupported Media Type",
+                                "detailedMessage": "Unsupported request media type",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "UnprocessableEntity": {
+                "description": "Unprocessable Entity - Identify business errors that can be detailed according to backend system rules. The possible values are: \n  * API-NCCIPCUSTOMERSCONTRACTS-001: Bloqueio por inadimplência.  \n  * API-NCCIPCUSTOMERSCONTRACTS-002: Instância associada ao Designation ID não está em status ativo.\n  * API-NCCIPCUSTOMERSCONTRACTS-003: Designation Id não encontrado ou a instância encontrada. \n  * API-NCCIPCUSTOMERSCONTRACTS-004: Bloqueio por cobrança.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "examples": {
+                            "UnprocessableEntity": {
+                                "summary": "Bloqueio por inadimplência",
+                                "value": {
+                                    "apiVersion": "1;2026-02-19",
+                                    "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                                    "error": {
+                                        "httpCode": "422",
+                                        "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-001",
+                                        "message": "Unprocessable Entity",
+                                        "detailedMessage": "Bloqueio por inadimplência",
+                                        "link": {
+                                            "rel": "related",
+                                            "href": "https://api.claro.com.br/docs"
+                                        }
+                                    }
+                                }
+                            },
+                            "IncorrectDistribution": {
+                                "summary": "Instância associada ao Designation ID não está em status ativo",
+                                "value": {
+                                    "apiVersion": "1;2026-02-19",
+                                    "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                                    "error": {
+                                        "httpCode": "422",
+                                        "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-002",
+                                        "message": "Unprocessable Entity",
+                                        "detailedMessage": "Instância associada ao Designation ID não está em status ativo",
+                                        "link": {
+                                            "rel": "related",
+                                            "href": "https://api.claro.com.br/docs"
+                                        }
+                                    }
+                                }
+                            },
+                            "BackendFault": {
+                                "summary": "Designation Id não encontrado ou a instância encontrada",
+                                "value": {
+                                    "apiVersion": "1;2026-02-19",
+                                    "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                                    "error": {
+                                        "httpCode": "422",
+                                        "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-003",
+                                        "message": "Unprocessable Entity",
+                                        "detailedMessage": "Designation Id não encontrado ou a instância encontrada",
+                                        "link": {
+                                            "rel": "related",
+                                            "href": "https://api.claro.com.br/docs"
+                                        }
+                                    }
+                                }
+                            },
+                            "ValidationError": {
+                                "summary": "Bloqueio por cobrança",
+                                "value": {
+                                    "apiVersion": "1;2026-02-19",
+                                    "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                                    "error": {
+                                        "httpCode": "422",
+                                        "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-004",
+                                        "message": "Unprocessable Entity",
+                                        "detailedMessage": "Bloqueio por cobrança",
+                                        "link": {
+                                            "rel": "related",
+                                            "href": "https://api.claro.com.br/docs"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "TooManyRequests": {
+                "description": "Too Many Requests",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "429",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-429",
+                                "message": "Too Many Requests",
+                                "detailedMessage": "Consumer requests exceeded policies",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "InternalServerError": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "500",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-500",
+                                "message": "Internal Server Error",
+                                "detailedMessage": "Internal server error",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "ServiceUnavailable": {
+                "description": "Service Unavailable",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-02-19",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "503",
+                                "errorCode": "API-NCCIPCUSTOMERSCONTRACTS-503",
+                                "message": "Service Unavailable",
+                                "detailedMessage": "Service Unavailable",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

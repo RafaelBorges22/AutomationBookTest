@@ -1,0 +1,2255 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Resource Inventory - TMFCPQD GPL Resource Inventory (Proxy Apigee: inventory-tmfcpqdgplresourceinventory-v1)",
+        "description": "<table>\n  <thead>\n    <tr>\n      <th>Version</th>\n      <th>Author</th>\n      <th>Date</th>\n      <th>Changes</th>\n    </tr>\n  </thead>  \n  <tbody>\n    <tr>\n      <td>1.0.0</td>\n      <td>Roberto Yukio Mata</td>\n      <td>2025-11-12</td>\n      <td>[Fulfillment] - Versão inicial.</td>\n    </tr>\n  </tbody>\n</table>\n\n## Objetivo\nExposição da TMF639 - Resource Inventory Management, para a solução Netcracker Fulfilment/OSS, que visa integrar o módulo SOM da Netcracker com o sistema GPL do CPQD, para gerenciamento de recursos de inventário físicos e lógicos.\n## Público-alvo\nConsumidor será o \"SOM\" da Netcracker.\n## Provedores\nO backend provedor da API será o \"GPL\" da CPQD.\n## Contexto em que a API se insere\nAs funções principais desta interface entre o \"GPL\" e solicitadas pela API639 pelo \"SOM\" serão:\n\nConsulta de Recurso por id ou lista de Recursos\n\nAtualização parcial de um Recurso\n\nCriação de um Recurso\n\nRemoção de um Recurso",
+        "version": "1;2025-11-12",
+        "contact": {
+            "name": "CC-Integração",
+            "email": "coee.api.integracao@claro.com.br"
+        },
+        "x-claro-domains": [
+            "Resource Inventory"
+        ]
+    },
+    "security": [
+        {
+            "BasicAuth": []
+        },
+        {
+            "BearerAuth": []
+        },
+        {
+            "ApiKeyAuth": []
+        },
+        {
+            "OAuth2": []
+        }
+    ],
+    "servers": [
+        {
+            "url": "https://api-sandbox.claro.com.br/inventory/v1",
+            "description": "Sandbox (SaaS)"
+        },
+        {
+            "url": "https://test.apigw.claro.com.br/inventory/v1",
+            "description": "Test (on-premises)"
+        },
+        {
+            "url": "https://api-test.claro.com.br/inventory/v1",
+            "description": "Test (SaaS)"
+        },
+        {
+            "url": "https://api.claro.com.br/inventory/v1",
+            "description": "Production (SaaS)"
+        },
+        {
+            "url": "https://cas.apigw.claro.com.br/inventory/v1",
+            "description": "Production (on-premises DC Campinas)"
+        },
+        {
+            "url": "https://lpa.apigw.claro.com.br/inventory/v1",
+            "description": "Production (on-premises DC Lapa)"
+        }
+    ],
+    "paths": {
+        "/tmf/cpqd/gpl/resourceinventory/resource": {
+            "get": {
+                "operationId": "listResource",
+                "summary": "Consultar Recursos. Recupera recursos existentes aplicando filtros opcionais. Backend: GPL do CPQD",
+                "description": "Esta operação lista ou busca entidades de Recurso.\n\nA busca pode ser executada por filtragem de atributos. Ex.:\n\nGET /inventory/v1/tmf/cpqd/gpl/resourceinventory/resource?category=Premium\n",
+                "tags": [
+                    "resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "fields",
+                        "description": "Propriedades separadas por vírgulas a serem fornecidas na resposta",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "id,name,category"
+                    },
+                    {
+                        "name": "offset",
+                        "description": "Índice solicitado para o início dos recursos a serem fornecidos na resposta",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 2
+                    },
+                    {
+                        "name": "limit",
+                        "description": "Quantidade solicitada de recursos a serem fornecidos na resposta",
+                        "required": false,
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 5
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sucesso",
+                        "headers": {
+                            "X-Result-Count": {
+                                "description": "Número real de itens retornados no corpo da resposta",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-Total-Count": {
+                                "description": "Número total de itens que correspondem aos critérios",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Resource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/403"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "405": {
+                        "$ref": "#/components/responses/405"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/406"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/409"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/429"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/503"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createResource",
+                "summary": "Criar Recurso. Cria um novo recurso no catálogo de inventário. Backend: GPL do CPQD",
+                "description": "Esta operação cria uma entidade de Recurso.",
+                "tags": [
+                    "resource"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource_Create"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "$ref": "#/components/schemas/Resource"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/403"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "405": {
+                        "$ref": "#/components/responses/405"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/406"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/409"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/429"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/503"
+                    }
+                }
+            }
+        },
+        "/tmf/cpqd/gpl/resourceinventory/resource/{resourceId}": {
+            "get": {
+                "operationId": "retrieveResource",
+                "summary": "Consultar recurso por id. Obtém detalhes completos de um recurso pelo seu identificador único. Backend: GPL do CPQD.",
+                "description": "Essa operação recupera uma entidade de Recurso. A seleção de atributos está habilitada para todos os atributos de primeiro nível.",
+                "tags": [
+                    "resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "resourceId",
+                        "description": "Identificador do Recurso",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path",
+                        "example": 5
+                    },
+                    {
+                        "name": "fields",
+                        "description": "Propriedades separadas por vírgulas a serem fornecidas na resposta",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "query",
+                        "example": "id,name,category"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Resource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/403"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "405": {
+                        "$ref": "#/components/responses/405"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/406"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/409"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/429"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/503"
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "patchResource",
+                "summary": "Atualizar recurso parcialmente. Atualiza parcialmente os atributos de um recurso existente conforme a requisição. Backend: GPL do CPQD",
+                "description": "Esta operação atualiza parcialmente uma entidade de Recurso.",
+                "tags": [
+                    "resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "resourceId",
+                        "description": "Identificador do Recurso",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Resource_Update"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/schemas/Resource"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/403"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "405": {
+                        "$ref": "#/components/responses/405"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/406"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/409"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/429"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/503"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteResource",
+                "summary": "Apagar recurso. Remove um recurso do inventário de forma definitiva com base no seu identificador. Backend: GPL do CPQD",
+                "description": "Esta operação exclui uma entidade de Recurso.",
+                "tags": [
+                    "resource"
+                ],
+                "parameters": [
+                    {
+                        "name": "resourceId",
+                        "description": "Identificador do Recurso",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Excluído"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/403"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/404"
+                    },
+                    "405": {
+                        "$ref": "#/components/responses/405"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/406"
+                    },
+                    "409": {
+                        "$ref": "#/components/responses/409"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/429"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/503"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "BasicAuth": {
+                "type": "http",
+                "scheme": "basic"
+            },
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            },
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Client-Key"
+            },
+            "OAuth2": {
+                "type": "oauth2",
+                "flows": {
+                    "clientCredentials": {
+                        "tokenUrl": "/oauth2/v1/token",
+                        "scopes": {}
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "Addressable": {
+                "type": "object",
+                "description": "Esquema base para entidades endereçáveis",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    }
+                }
+            },
+            "Any": {},
+            "Attachment": {
+                "type": "object",
+                "description": "Complements the description of an element (for instance a product) through video, pictures...",
+                "properties": {
+                    "id": {
+                        "example": "4aafacbd-11ff-4dc8-b445-305f2215715f",
+                        "type": "string",
+                        "description": "Identificador exclusivo para este anexo em particular"
+                    },
+                    "href": {
+                        "example": "http://host/Attachment/4aafacbd-11ff-4dc8-b445-305f2215715f",
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URI deste Anexo"
+                    },
+                    "attachmentType": {
+                        "example": "video",
+                        "type": "string",
+                        "description": "Tipo de anexo, como vídeo ou imagem"
+                    },
+                    "content": {
+                        "type": "string",
+                        "format": "base64",
+                        "description": "O conteúdo real do objeto de anexo, quando incorporado, codificado em base64."
+                    },
+                    "description": {
+                        "example": "Photograph of the Product",
+                        "type": "string",
+                        "description": "Um texto descritivo que detalha o conteúdo do anexo"
+                    },
+                    "mimeType": {
+                        "type": "string",
+                        "description": "Tipo MIME do anexo, como a extensão de arquivo para vídeo, imagem ou documento."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome do anexo"
+                    },
+                    "url": {
+                        "example": "http://host/Content/4aafacbd-11ff-4dc8-b445-305f2215715f",
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Localizador Uniforme de Recursos (URL), endereço de página web (subconjunto de URI)"
+                    },
+                    "size": {
+                        "$ref": "#/components/schemas/Quantity",
+                        "description": "Tamanho do anexo"
+                    },
+                    "validFor": {
+                        "$ref": "#/components/schemas/TimePeriod",
+                        "description": "Período de tempo durante o qual o anexo é válido"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "AttachmentRef": {
+                "type": "object",
+                "description": "Referência de anexo. Um anexo complementa a descrição de um elemento (por exemplo, um produto) por meio de vídeo ou imagens",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador exclusivo para este anexo"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URL que serve como referência para o recurso de anexo"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Um texto descritivo que detalha o conteúdo do anexo"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da entidade relacionada."
+                    },
+                    "url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Link para o conteúdo/mídia do anexo"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "Tipo real da instância de destino, usado quando necessário para desambiguação."
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "AttachmentRefOrValue": {
+                "type": "object",
+                "description": "Um anexo por valor ou por referência. Um anexo complementa a descrição de um elemento, por exemplo, por meio de um documento, vídeo ou imagem.",
+                "properties": {
+                    "id": {
+                        "example": "4aafacbd-11ff-4dc8-b445-305f2215715f",
+                        "type": "string",
+                        "description": "Identificador exclusivo para este anexo em particular"
+                    },
+                    "href": {
+                        "example": "http://host/Attachment/4aafacbd-11ff-4dc8-b445-305f2215715f",
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URI deste Anexo"
+                    },
+                    "attachmentType": {
+                        "example": "video",
+                        "type": "string",
+                        "description": "Tipo de anexo, como vídeo ou imagem"
+                    },
+                    "content": {
+                        "type": "string",
+                        "format": "base64",
+                        "description": "O conteúdo real do objeto de anexo, quando incorporado, codificado em base64."
+                    },
+                    "description": {
+                        "example": "Photograph of the Product",
+                        "type": "string",
+                        "description": "Um texto descritivo que detalha o conteúdo do anexo"
+                    },
+                    "mimeType": {
+                        "type": "string",
+                        "description": "Tipo MIME do anexo, como a extensão de arquivo para vídeo, imagem ou documento."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome do anexo"
+                    },
+                    "url": {
+                        "example": "http://host/Content/4aafacbd-11ff-4dc8-b445-305f2215715f",
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Endereço de página web (subconjunto de URI)"
+                    },
+                    "size": {
+                        "$ref": "#/components/schemas/Quantity",
+                        "description": "Tamanho do anexo."
+                    },
+                    "validFor": {
+                        "$ref": "#/components/schemas/TimePeriod",
+                        "description": "Período de tempo durante o qual o anexo é válido"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "Tipo real da instância de destino, usado quando necessário para desambiguação."
+                    }
+                }
+            },
+            "Characteristic": {
+                "type": "object",
+                "description": "Descreve uma característica específica de um objeto ou entidade por meio de um par nome/valor.",
+                "required": [
+                    "name",
+                    "value"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador exclusivo da característica"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da característica"
+                    },
+                    "valueType": {
+                        "type": "string",
+                        "description": "Tipo de dado do valor da característica"
+                    },
+                    "characteristicRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CharacteristicRelationship"
+                        }
+                    },
+                    "value": {
+                        "$ref": "#/components/schemas/Any",
+                        "description": "Valor da característica"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "CharacteristicRelationship": {
+                "type": "object",
+                "description": "Outra característica relacionada à característica atual",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador exclusivo da característica"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "relationshipType": {
+                        "type": "string",
+                        "description": "Tipo de relacionamento"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "ConstraintRef": {
+                "type": "object",
+                "description": "Referência de Constraint. O recurso Constraint representa uma política/regra aplicada a uma entidade ou à especificação de uma entidade.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da entidade relacionada."
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Versão da constraint"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "The actual type of the target instance when needed for disambiguation."
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "Entity": {
+                "type": "object",
+                "description": "Esquema de entidade base para uso nas Open-APIs do TMForum",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "EntityRef": {
+                "type": "object",
+                "description": "Esquema de referência de entidade a ser usado para todas as classes entityRef.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da entidade relacionada."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "O tipo real da instância de destino, quando necessário para desambiguação."
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "Extensible": {
+                "type": "object",
+                "description": "Esquema extensível base para uso em Open APIs do TMForum",
+                "properties": {
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "Feature": {
+                "type": "object",
+                "description": "Recurso de configuração.",
+                "required": [
+                    "featureCharacteristic",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador único da funcionalidade.."
+                    },
+                    "isBundle": {
+                        "type": "boolean",
+                        "description": "Verdadeiro se este for um grupo de funcionalidades. O padrão é falso."
+                    },
+                    "isEnabled": {
+                        "type": "boolean",
+                        "description": "Verdadeiro se esta funcionalidade estiver habilitada. O padrão é verdadeiro."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da funcionalidade."
+                    },
+                    "constraint": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConstraintRef"
+                        },
+                        "description": "Lista de constraints da funcionalidade."
+                    },
+                    "featureCharacteristic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Characteristic"
+                        },
+                        "minItems": 1,
+                        "description": "Lista de características associadas a uma funcionalidade específica."
+                    },
+                    "featureRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FeatureRelationship"
+                        }
+                    }
+                }
+            },
+            "FeatureRelationship": {
+                "type": "object",
+                "description": "Recurso de configuração",
+                "required": [
+                    "name",
+                    "relationshipType"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador exclusivo da funcionalidade de destino."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da funcionalidade de destino."
+                    },
+                    "relationshipType": {
+                        "type": "string",
+                        "description": "Tipo de relacionamento da funcionalidade."
+                    },
+                    "validFor": {
+                        "$ref": "#/components/schemas/TimePeriod",
+                        "description": "Período de validade do relacionamento da funcionalidade."
+                    }
+                }
+            },
+            "LogicalResource": {
+                "type": "object",
+                "description": "O recurso Logic é um tipo de recurso que descreve o conjunto comum de atributos compartilhados por todos os recursos lógicos concretos (por exemplo, TPE, MSISDN, endereços IP) no inventário.",
+                "required": [
+                    "href",
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Categoria do recurso concreto, por exemplo, Gold ou Silver para um recurso concreto do tipo MSISDN."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descrição em texto livre do recurso"
+                    },
+                    "endOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data até a qual o recurso está operando"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "String usada para dar um nome ao recurso"
+                    },
+                    "resourceVersion": {
+                        "type": "string",
+                        "description": "A field that identifies the specific version of an instance of a resource."
+                    },
+                    "startOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data a partir da qual o recurso está operando"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "Valor do recurso lógico. Exemplo '0746712345' para MSISDNs"
+                    },
+                    "activationFeature": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        },
+                        "description": "Recursos de configuração"
+                    },
+                    "administrativeState": {
+                        "$ref": "#/components/schemas/ResourceAdministrativeStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "attachment": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AttachmentRefOrValue"
+                        }
+                    },
+                    "note": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Note"
+                        }
+                    },
+                    "operationalState": {
+                        "$ref": "#/components/schemas/ResourceOperationalStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "place": {
+                        "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+                    },
+                    "relatedParty": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelatedParty"
+                        }
+                    },
+                    "resourceCharacteristic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Characteristic"
+                        }
+                    },
+                    "resourceRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResourceRelationship"
+                        }
+                    },
+                    "resourceSpecification": {
+                        "$ref": "#/components/schemas/ResourceSpecificationRef"
+                    },
+                    "resourceStatus": {
+                        "$ref": "#/components/schemas/ResourceStatusType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "usageState": {
+                        "$ref": "#/components/schemas/ResourceUsageStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "Note": {
+                "type": "object",
+                "description": "Informações adicionais sobre uma determinada entidade",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador da observação dentro da entidade que a contém (pode ou não ser globalmente único, dependendo da implementação do provedor)."
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "author": {
+                        "type": "string",
+                        "description": "Autor da observação"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data da observação."
+                    },
+                    "text": {
+                        "type": "string",
+                        "description": "Texto da observação"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "PhysicalResource": {
+                "type": "object",
+                "description": "O recurso Physical é um tipo de recurso que descreve o conjunto comum de atributos compartilhados por todos os recursos físicos concretos (por exemplo, EQUIPAMENTO) no inventário.",
+                "required": [
+                    "href",
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Categoria do recurso concreto, por exemplo, Gold ou Silver para um recurso concreto do tipo MSISDN."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descrição em texto livre do recurso"
+                    },
+                    "endOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data até a qual o recurso está operando"
+                    },
+                    "manufactureDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Este é um atributo do tipo string que define a data de fabricação deste item no formato fixo \"dd/mm/yyyy\". Este é um atributo opcional."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "String usada para dar um nome ao recurso"
+                    },
+                    "powerState": {
+                        "type": "string",
+                        "description": "Define o status atual de energia do item de hardware. Os valores possíveis incluem:\n\n  0:  Unknown\n  1:  Not Applicable\n  2:  No Power Applied\n  3: Full Power Applied\n  4:  Power Save - Normal\n  5:  Power Save - Degraded\n  6:  Power Save - Standby\n  7:  Power Save - Critical\n  8:  Power Save - Low Power Mode\n  9:  Power Save - Unknown\n 10: Power Cycle\n 11: Power Warning\n 12: Power Off"
+                    },
+                    "resourceVersion": {
+                        "type": "string",
+                        "description": "Campo que identifica a versão específica de uma instância de um recurso."
+                    },
+                    "serialNumber": {
+                        "type": "string",
+                        "description": "Este é um atributo do tipo string que representa um número atribuído pelo fabricante, utilizado para identificar diferentes instâncias de um mesmo item de hardware. Os atributos ModelNumber e PartNumber são usados para identificar diferentes tipos de itens de hardware. Este é um atributo OBRIGATÓRIO."
+                    },
+                    "startOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data a partir da qual o recurso está operando"
+                    },
+                    "versionNumber": {
+                        "type": "string",
+                        "description": "Este é um atributo do tipo string que identifica a versão deste recurso físico. Este é um atributo opcional."
+                    },
+                    "activationFeature": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        },
+                        "description": "Recursos de configuração"
+                    },
+                    "administrativeState": {
+                        "$ref": "#/components/schemas/ResourceAdministrativeStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "attachment": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AttachmentRefOrValue"
+                        }
+                    },
+                    "note": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Note"
+                        }
+                    },
+                    "operationalState": {
+                        "$ref": "#/components/schemas/ResourceOperationalStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "place": {
+                        "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+                    },
+                    "relatedParty": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelatedParty"
+                        }
+                    },
+                    "resourceCharacteristic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Characteristic"
+                        }
+                    },
+                    "resourceRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResourceRelationship"
+                        }
+                    },
+                    "resourceSpecification": {
+                        "$ref": "#/components/schemas/ResourceSpecificationRef"
+                    },
+                    "resourceStatus": {
+                        "$ref": "#/components/schemas/ResourceStatusType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "usageState": {
+                        "$ref": "#/components/schemas/ResourceUsageStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "Place": {
+                "type": "object",
+                "description": "Referência de local (Place). O recurso Place define os locais onde os produtos são vendidos ou entregues.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador único do local."
+                    },
+                    "href": {
+                        "type": "string",
+                        "description": "Referência única do local."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Um nome de fácil identificação para o local, como [Loja Paris], [Loja Londres], [Residência Principal]."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "PlaceRef": {
+                "type": "object",
+                "description": "Referência de local (Place). O recurso Place define os locais onde os produtos são vendidos ou entregues.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the related entity."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "O tipo real da instância de destino, quando necessário para desambiguação."
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "Quantity": {
+                "type": "object",
+                "description": "Um valor em uma determinada unidade.",
+                "properties": {
+                    "amount": {
+                        "default": 1,
+                        "type": "number",
+                        "format": "float",
+                        "description": "NValor numérico em uma determinada unidade."
+                    },
+                    "units": {
+                        "type": "string",
+                        "description": "Unidade"
+                    }
+                }
+            },
+            "RelatedParty": {
+                "type": "object",
+                "description": "Referência de entidade relacionada (Related Entity). Uma parte relacionada define uma parte ou função de parte vinculada a uma entidade específica.",
+                "required": [
+                    "@referredType",
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Nome da entidade relacionada."
+                    },
+                    "role": {
+                        "type": "string",
+                        "description": "Função desempenhada pela parte relacionada."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "The actual type of the target instance when needed for disambiguation."
+                    }
+                }
+            },
+            "RelatedPlaceRefOrValue": {
+                "type": "object",
+                "description": "Referência de entidade relacionada (Related Place). Um local relacionado define um local descrito por referência ou valor, vinculado a uma entidade específica.Os atributos polimórficos @type, @schemaLocation e @referredType estão relacionados à entidade Place e não à própria classe RelatedPlaceRefOrValue.",
+                "required": [
+                    "role"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador único do local."
+                    },
+                    "href": {
+                        "type": "string",
+                        "description": "Referência única do local."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Um nome de fácil identificação para o local, como [Loja Paris], [Loja Londres], [Residência Principal]."
+                    },
+                    "role": {
+                        "type": "string"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "The actual type of the target instance when needed for disambiguation."
+                    }
+                }
+            },
+            "Resource": {
+                "type": "object",
+                "description": "Resource é uma entidade abstrata que descreve o conjunto comum de atributos compartilhados por todos os recursos concretos (por exemplo, TPE, EQUIPAMENTO) no inventário.",
+                "required": [
+                    "href",
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador de uma instância do recurso. Deve ser único dentro do tipo de recurso. É utilizado em URIs como identificador de instâncias específicas de um determinado tipo.",
+                        "example": 5
+                    },
+                    "href": {
+                        "type": "string",
+                        "description": "A URI do próprio objeto."
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Categoria do recurso concreto, por exemplo, Gold ou Silver para um recurso concreto do tipo MSISDN."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descrição em texto livre do recurso"
+                    },
+                    "endOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data até a qual o recurso está operando"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "String usada para dar um nome ao recurso"
+                    },
+                    "resourceVersion": {
+                        "type": "string",
+                        "description": "A field that identifies the specific version of an instance of a resource."
+                    },
+                    "startOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data a partir da qual o recurso está operando"
+                    },
+                    "activationFeature": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        },
+                        "description": "Recursos de configuração"
+                    },
+                    "administrativeState": {
+                        "$ref": "#/components/schemas/ResourceAdministrativeStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "attachment": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AttachmentRefOrValue"
+                        }
+                    },
+                    "note": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Note"
+                        }
+                    },
+                    "operationalState": {
+                        "$ref": "#/components/schemas/ResourceOperationalStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "place": {
+                        "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+                    },
+                    "relatedParty": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelatedParty"
+                        }
+                    },
+                    "resourceCharacteristic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Characteristic"
+                        }
+                    },
+                    "resourceRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResourceRelationship"
+                        }
+                    },
+                    "resourceSpecification": {
+                        "$ref": "#/components/schemas/ResourceSpecificationRef"
+                    },
+                    "resourceStatus": {
+                        "$ref": "#/components/schemas/ResourceStatusType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "usageState": {
+                        "$ref": "#/components/schemas/ResourceUsageStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "Resource_Create": {
+                "type": "object",
+                "description": "Resource é uma entidade abstrata que descreve o conjunto comum de atributos compartilhados por todos os recursos concretos (por exemplo, TPE, EQUIPAMENTO) no inventário.",
+                "required": [
+                    "href",
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identifier of an instance of the resource. Required to be unique within the resource type.  Used in URIs as the identifier for specific instances of a type."
+                    },
+                    "href": {
+                        "type": "string",
+                        "description": "The URI for the object itself."
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Categoria do recurso concreto, por exemplo, Gold ou Silver para um recurso concreto do tipo MSISDN."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descrição em texto livre do recurso"
+                    },
+                    "endOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data até a qual o recurso está operando"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "String usada para dar um nome ao recurso"
+                    },
+                    "resourceVersion": {
+                        "type": "string",
+                        "description": "A field that identifies the specific version of an instance of a resource."
+                    },
+                    "startOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data a partir da qual o recurso está operando"
+                    },
+                    "activationFeature": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        },
+                        "description": "Recursos de configuração"
+                    },
+                    "administrativeState": {
+                        "$ref": "#/components/schemas/ResourceAdministrativeStateType",
+                        "description": "Tracks the lifecycle status of the resource, such as planning, installing, opereating, retiring and so on."
+                    },
+                    "attachment": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AttachmentRefOrValue"
+                        }
+                    },
+                    "note": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Note"
+                        }
+                    },
+                    "operationalState": {
+                        "$ref": "#/components/schemas/ResourceOperationalStateType",
+                        "description": "Tracks the lifecycle status of the resource, such as planning, installing, opereating, retiring and so on."
+                    },
+                    "place": {
+                        "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+                    },
+                    "relatedParty": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelatedParty"
+                        }
+                    },
+                    "resourceCharacteristic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Characteristic"
+                        }
+                    },
+                    "resourceRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResourceRelationship"
+                        }
+                    },
+                    "resourceSpecification": {
+                        "$ref": "#/components/schemas/ResourceSpecificationRef"
+                    },
+                    "resourceStatus": {
+                        "$ref": "#/components/schemas/ResourceStatusType",
+                        "description": "Tracks the lifecycle status of the resource, such as planning, installing, opereating, retiring and so on."
+                    },
+                    "usageState": {
+                        "$ref": "#/components/schemas/ResourceUsageStateType",
+                        "description": "Tracks the lifecycle status of the resource, such as planning, installing, opereating, retiring and so on."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "Resource_Update": {
+                "type": "object",
+                "description": "Resource is an abstract entity that describes the common set of attributes shared by all concrete resources (e.g. TPE, EQUIPMENT) in the inventory.",
+                "required": [
+                    "href",
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identifier of an instance of the resource. Required to be unique within the resource type.  Used in URIs as the identifier for specific instances of a type."
+                    },
+                    "href": {
+                        "type": "string",
+                        "description": "The URI for the object itself."
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Categoria do recurso concreto, por exemplo, Gold ou Silver para um recurso concreto do tipo MSISDN."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descrição em texto livre do recurso"
+                    },
+                    "endOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data até a qual o recurso está operando"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "String usada para dar um nome ao recurso"
+                    },
+                    "resourceVersion": {
+                        "type": "string",
+                        "description": "Campo que identifica a versão específica de uma instância de um recurso."
+                    },
+                    "startOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data a partir da qual o recurso está operando"
+                    },
+                    "activationFeature": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        },
+                        "description": "Recursos de configuração"
+                    },
+                    "administrativeState": {
+                        "$ref": "#/components/schemas/ResourceAdministrativeStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "attachment": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AttachmentRefOrValue"
+                        }
+                    },
+                    "note": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Note"
+                        }
+                    },
+                    "operationalState": {
+                        "$ref": "#/components/schemas/ResourceOperationalStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "place": {
+                        "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+                    },
+                    "relatedParty": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelatedParty"
+                        }
+                    },
+                    "resourceCharacteristic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Characteristic"
+                        }
+                    },
+                    "resourceRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResourceRelationship"
+                        }
+                    },
+                    "resourceSpecification": {
+                        "$ref": "#/components/schemas/ResourceSpecificationRef"
+                    },
+                    "resourceStatus": {
+                        "$ref": "#/components/schemas/ResourceStatusType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "usageState": {
+                        "$ref": "#/components/schemas/ResourceUsageStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "ResourceAdministrativeStateType": {
+                "type": "string",
+                "description": "Enumerações do tipo ResourceAdministrativeStateType",
+                "enum": [
+                    "locked",
+                    "unlocked",
+                    "shutdown"
+                ]
+            },
+            "ResourceOperationalStateType": {
+                "type": "string",
+                "description": "Enumerações do tipo ResourceOperationalStateType",
+                "enum": [
+                    "enable",
+                    "disable"
+                ]
+            },
+            "ResourceRef": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the related entity."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "The actual type of the target instance when needed for disambiguation."
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "ResourceRefOrValue": {
+                "type": "object",
+                "description": "Resource é uma entidade abstrata que descreve o conjunto comum de atributos compartilhados por todos os recursos concretos. Os atributos polimórficos @type, @schemaLocation e @referredType estão relacionados à entidade Resource, e não à própria classe ResourceRefOrValue.",
+                "required": [
+                    "href",
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identificador de uma instância do recurso. Deve ser único dentro do tipo de recurso. É utilizado em URIs como identificador de instâncias específicas de um determinado tipo."
+                    },
+                    "href": {
+                        "type": "string",
+                        "description": "A URI do próprio objeto."
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Categoria do recurso concreto, por exemplo, Gold ou Silver para um recurso concreto do tipo MSISDN."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Descrição em texto livre do recurso"
+                    },
+                    "endOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data até a qual o recurso está operando"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "String usada para dar um nome ao recurso"
+                    },
+                    "resourceVersion": {
+                        "type": "string",
+                        "description": "Campo que identifica a versão específica de uma instância de um recurso."
+                    },
+                    "startOperatingDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Data e hora (DateTime). Data a partir da qual o recurso está operando"
+                    },
+                    "activationFeature": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        },
+                        "description": "Recursos de configuração"
+                    },
+                    "administrativeState": {
+                        "$ref": "#/components/schemas/ResourceAdministrativeStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "attachment": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/AttachmentRefOrValue"
+                        }
+                    },
+                    "note": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Note"
+                        }
+                    },
+                    "operationalState": {
+                        "$ref": "#/components/schemas/ResourceOperationalStateType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "place": {
+                        "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+                    },
+                    "relatedParty": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelatedParty"
+                        }
+                    },
+                    "resourceCharacteristic": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Characteristic"
+                        }
+                    },
+                    "resourceRelationship": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ResourceRelationship"
+                        }
+                    },
+                    "resourceSpecification": {
+                        "$ref": "#/components/schemas/ResourceSpecificationRef"
+                    },
+                    "resourceStatus": {
+                        "$ref": "#/components/schemas/ResourceStatusType",
+                        "description": "Acompanha o status do ciclo de vida do recurso, como planejamento, instalação, operação, desativação, entre outros."
+                    },
+                    "usageState": {
+                        "$ref": "#/components/schemas/ResourceUsageStateType",
+                        "description": "Tracks the lifecycle status of the resource, such as planning, installing, opereating, retiring and so on."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "O tipo real da instância de destino, quando necessário para desambiguação."
+                    }
+                }
+            },
+            "ResourceRelationship": {
+                "type": "object",
+                "description": "Recursos vinculados ao recurso instanciado, como:\n[bundled] – se o recurso for um pacote (bundle) e for necessário descrever os recursos incluídos nesse pacote;\n[reliesOn] – se o recurso depender de outro recurso já existente, por exemplo, uma opção associada a um recurso de acesso móvel já provisionado;\n[targets] ou [isTargeted] – dependendo da forma de expressar o vínculo, para qualquer outro tipo de relacionamento que possa ser útil.",
+                "required": [
+                    "relationshipType",
+                    "resource"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "relationshipType": {
+                        "example": "bundled",
+                        "type": "string",
+                        "description": "Tipo de relação entre recursos, como:\n[bundled] – se o recurso for um pacote (bundle) e for necessário descrever os recursos incluídos nesse pacote;\n[reliesOn] – se o recurso depender de outro recurso já existente, por exemplo, uma opção associada a um recurso de acesso móvel já provisionado;\n[targets] ou [isTargeted] – dependendo da forma de expressar o vínculo, para qualquer outro tipo de relacionamento que possa ser útil."
+                    },
+                    "resource": {
+                        "$ref": "#/components/schemas/ResourceRefOrValue"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    }
+                }
+            },
+            "ResourceSpecificationRef": {
+                "type": "object",
+                "description": "Recursos são componentes físicos ou não físicos (ou uma combinação de ambos) dentro da infraestrutura ou inventário de uma empresa. Eles são normalmente consumidos ou utilizados por serviços (por exemplo, uma porta física atribuída a um serviço) ou contribuem para a realização de um Produto (por exemplo, um cartão SIM).\n  Podem pertencer aos domínios de Aplicação, Computação e Rede, incluindo, por exemplo, elementos de rede, softwares, sistemas de TI, conteúdos e informações, e componentes tecnológicos.\n\nResourceSpecification é uma classe base abstrata usada para representar um meio genérico de implementar um tipo específico de Recurso. Em essência, uma ResourceSpecification define os atributos e relacionamentos comuns de um conjunto de Recursos relacionados, enquanto Resource define uma instância específica baseada em uma determinada ResourceSpecification.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "identificador único"
+                    },
+                    "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Referência de hiperlink"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the related entity."
+                    },
+                    "version": {
+                        "type": "string",
+                        "description": "Resource Specification version"
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse"
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome extensível da subclasse"
+                    },
+                    "@referredType": {
+                        "type": "string",
+                        "description": "Tipo real da instância de destino, usado quando necessário para desambiguação."
+                    }
+                },
+                "required": [
+                    "id"
+                ]
+            },
+            "ResourceStatusType": {
+                "type": "string",
+                "description": "Enumerações do tipo ResourceStatusType",
+                "enum": [
+                    "standby",
+                    "alarm",
+                    "available",
+                    "reserved",
+                    "unknown",
+                    "suspended"
+                ]
+            },
+            "ResourceUsageStateType": {
+                "type": "string",
+                "description": "Enumerações do tipo ResourceUsageStateType",
+                "enum": [
+                    "idle",
+                    "active",
+                    "busy"
+                ]
+            },
+            "TimePeriod": {
+                "type": "object",
+                "description": "Um período de tempo, que pode ser definido apenas por uma data/hora de término (endDateTime), apenas por uma data/hora de início (startDateTime) ou por ambas.",
+                "properties": {
+                    "endDateTime": {
+                        "example": "1985-04-12T23:20:50.52Z",
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Fim do período de tempo, usando o formato IETC-RFC-3339"
+                    },
+                    "startDateTime": {
+                        "example": "1985-04-12T23:20:50.52Z",
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Início do período de tempo, usando o formato IETC-RFC-3339"
+                    }
+                }
+            },
+            "Error": {
+                "description": "Usado quando uma API gera um erro, normalmente acompanhado de um código de resposta HTTP (3xx, 4xx, 5xx).",
+                "type": "object",
+                "required": [
+                    "code",
+                    "reason"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "description": "Detalhe relevante para a aplicação, definido na API ou em lista comum."
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Explicação do motivo do erro, que pode ser exibida ao usuário cliente."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Mais detalhes e ações corretivas relacionadas ao erro, que podem ser exibidas ao usuário cliente."
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Extensão de código de erro HTTP"
+                    },
+                    "referenceError": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URI da documentação que descreve o erro."
+                    },
+                    "@baseType": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define a superclasse."
+                    },
+                    "@schemaLocation": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Uma URI para um arquivo JSON Schema que define atributos e relacionamentos adicionais."
+                    },
+                    "@type": {
+                        "type": "string",
+                        "description": "Ao criar subclasses, define o nome da entidade da subclasse."
+                    }
+                }
+            }
+        },
+        "responses": {
+            "400": {
+                "description": "Bad Request",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Bad Request",
+                                "value": {
+                                    "code": "400",
+                                    "reason": "Bad Request",
+                                    "message": "Bad Request",
+                                    "status": "400"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "401": {
+                "description": "Unauthorized",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Unauthorized",
+                                "value": {
+                                    "code": "401",
+                                    "reason": "Unauthorized",
+                                    "message": "Unauthorized",
+                                    "status": "401"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "403": {
+                "description": "Forbidden",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Forbidden",
+                                "value": {
+                                    "code": "403",
+                                    "reason": "Forbidden",
+                                    "message": "Forbidden",
+                                    "status": "403"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "404": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Not found",
+                                "value": {
+                                    "code": "404",
+                                    "reason": "Not found",
+                                    "message": "Not found",
+                                    "status": "404"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "405": {
+                "description": "Method Not Allowed",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Method Not Allowed",
+                                "value": {
+                                    "code": "405",
+                                    "reason": "Method Not Allowed",
+                                    "message": "Method Not Allowed",
+                                    "status": "405"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "406": {
+                "description": "Not Acceptable",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Not Acceptable",
+                                "value": {
+                                    "code": "406",
+                                    "reason": "Not Acceptable",
+                                    "message": "Not Acceptable",
+                                    "status": "406"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "409": {
+                "description": "Conflict",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Conflict",
+                                "value": {
+                                    "code": "409",
+                                    "reason": "Conflict",
+                                    "message": "Conflict",
+                                    "status": "409"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "429": {
+                "description": "Too Many Requests",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Too Many Requests",
+                                "value": {
+                                    "code": "429",
+                                    "reason": "Too Many Requests",
+                                    "message": "Too Many Requests",
+                                    "status": "429"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "500": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Internal Server Error",
+                                "value": {
+                                    "code": "500",
+                                    "reason": "Internal Server Error",
+                                    "message": "Internal Server Error",
+                                    "status": "500"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "503": {
+                "description": "Service Unavailable",
+                "content": {
+                    "application/json": {
+                        "examples": {
+                            "badRequestExample": {
+                                "summary": "Service Unavailable",
+                                "value": {
+                                    "code": "503",
+                                    "reason": "Service Unavailable",
+                                    "message": "Service Unavailable",
+                                    "status": "503"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

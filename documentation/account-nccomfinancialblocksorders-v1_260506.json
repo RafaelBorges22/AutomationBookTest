@@ -1,0 +1,691 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "NC COM FINANCIAL BLOCKS ORDERS - (Proxy Apigee:account-nccomfinancialblocksorders-v1)",
+        "description": "<table>\n  <thead>\n    <tr>\n      <th>Version</th>\n      <th>Author</th>\n      <th>Date</th>\n      <th>Changes</th>\n    </tr>\n  </thead>  \n  <tbody>\n    <tr>\n      <td>1.0.0</td>\n      <td>Roberto Yukio Mata</td>\n      <td>2026-01-07</td>\n      <td>[Fulfillment] - Versão inicial.</td>\n    </tr>\n  </tbody>\n</table>\n\n## Objetivo\n  Solicitações de bloqueio/desbloqueio financeiro da conta do cliente por meio do sistema COM da Netcracker.\n\n\n## Público-alvo\nConsumidor será o COBE\n## Provedores\nO backend provedor da API será o “COM” da Netcracker.\n## Contexto em que a API se Insere\nEsta API está inserida no conjunto de APIs do domínio Account e disponibiliza um método para bloqueio/desbloqueio financeiro da conta do cliente por meio do sistema COM da Netcracker.",
+        "version": "1;2026-01-07",
+        "contact": {
+            "name": "(CC-Integração)",
+            "email": "coee.api.integracao@claro.com.br"
+        },
+        "x-claro-domains": [
+            "Account"
+        ]
+    },
+    "security": [
+        {
+            "BasicAuth": []
+        },
+        {
+            "BearerAuth": []
+        },
+        {
+            "ApiKeyAuth": []
+        },
+        {
+            "OAuth2": []
+        }
+    ],
+    "servers": [
+        {
+            "url": "https://api-lab.claro.com.br/account/v1",
+            "description": "Lab (SaaS)"
+        },
+        {
+            "url": "https://api-dev.claro.com.br/account/v1",
+            "description": "Dev (SaaS)"
+        },
+        {
+            "url": "https://api-test.claro.com.br/account/v1",
+            "description": "Test (SaaS)"
+        },
+        {
+            "url": "https://api-sandbox.claro.com.br/account/v1",
+            "description": "Sandbox (SaaS)"
+        },
+        {
+            "url": "https://api-homolog.claro.com.br/account/v1",
+            "description": "Homologação (SaaS)"
+        },
+        {
+            "url": "https://api.claro.com.br/account/v1",
+            "description": "Produção (SaaS)"
+        },
+        {
+            "url": "https://lab.apigw.claro.com.br/account/v1",
+            "description": "Lab (OPDK)"
+        },
+        {
+            "url": "https://dev.apigw.claro.com.br/account/v1",
+            "description": "Dev (OPDK)"
+        },
+        {
+            "url": "https://test.apigw.claro.com.br/test06/account/v1",
+            "description": "Test (OPDK)"
+        },
+        {
+            "url": "https://cas.apigw.claro.com.br/account/v1",
+            "description": "Produção (OPDK Campinas)"
+        },
+        {
+            "url": "https://lpa.apigw.claro.com.br/account/v1",
+            "description": "Produção (OPDK Lapa)"
+        }
+    ],
+    "paths": {
+        "/nc/com/financialblocks/orders": {
+            "post": {
+                "summary": "(action = SUSPEND / RESUME): Solicitar bloqueio/desbloqueio financeiro de conta. Backend: Sistema COM (Customer Order Management) da Netcracker",
+                "operationId": "sendBillingAction",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FinancialBlocksRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "$ref": "#/components/responses/SucessResponse"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Forbidden"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    },
+                    "405": {
+                        "$ref": "#/components/responses/MethodNotAllowed"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptable"
+                    },
+                    "415": {
+                        "$ref": "#/components/responses/UnsupportedMediaType"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/UnprocessableEntity"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    },
+                    "503": {
+                        "$ref": "#/components/responses/ServiceUnavailable"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "BasicAuth": {
+                "type": "http",
+                "scheme": "basic"
+            },
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            },
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Client-Key"
+            },
+            "OAuth2": {
+                "type": "oauth2",
+                "flows": {
+                    "clientCredentials": {
+                        "tokenUrl": "/oauth2/v1/token",
+                        "scopes": {}
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "FinancialBlocksRequest": {
+                "type": "object",
+                "description": "\"Estrutura enviada pelo MS para NetCracker solicitando ação de bloqueio/desbloqueio.\"\n",
+                "required": [
+                    "data"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "required": [
+                            "action",
+                            "correlationId",
+                            "billingChargingCleAccount",
+                            "serviceAcronym",
+                            "customerDocumentId"
+                        ],
+                        "properties": {
+                            "correlationId": {
+                                "type": "string",
+                                "description": "ID da transação (para fins de rastreamento)",
+                                "example": "4c04bdc2-7130-46ed-8533-0c650b3c17a5"
+                            },
+                            "order": {
+                                "type": "object",
+                                "required": [
+                                    "action",
+                                    "serviceAcronym",
+                                    "Matricula"
+                                ],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "SUSPEND",
+                                            "RESUME"
+                                        ],
+                                        "description": "Ação:\n\n    •\t\"SUSPEND\" - para bloquear o serviço em caso de inadimplência\n    •\t\"RESUME\" - para desbloquear o serviço caso as dívidas tenham sido resolvidas",
+                                        "example": "SUSPEND"
+                                    },
+                                    "serviceAcronym": {
+                                        "type": "string",
+                                        "description": "Código do serviço (sigla)",
+                                        "example": "INN"
+                                    },
+                                    "Matricula": {
+                                        "type": "string",
+                                        "description": "Matricula do usuario",
+                                        "example": "123455"
+                                    },
+                                    "customer": {
+                                        "required": [
+                                            "billingChargingCleAccount",
+                                            "customerDocumentId"
+                                        ],
+                                        "type": "object",
+                                        "properties": {
+                                            "billingChargingCleAccount": {
+                                                "type": "string",
+                                                "description": "Conta CLE de cobrança do cliente",
+                                                "example": "92010r00901AS23DJRT_BR"
+                                            },
+                                            "customerDocumentId": {
+                                                "type": "string",
+                                                "description": "Documento do cliente (CNPJ)",
+                                                "example": "44976580000122"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "FinancialBlocksResponse": {
+                "type": "object",
+                "description": "Registro salvo na tabela de relatório.",
+                "required": [
+                    "apiVersion",
+                    "transactionId"
+                ],
+                "properties": {
+                    "apiVersion": {
+                        "type": "string",
+                        "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2026-01-07”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+                        "example": "1;2026-01-07"
+                    },
+                    "transactionId": {
+                        "type": "string",
+                        "example": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                        "description": "Retorna o identificador de rastreabilidade de transação gerado pela API."
+                    },
+                    "data": {
+                        "type": "object",
+                        "required": [
+                            "status"
+                        ],
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "description": "Resultado do processamento:\n\n  •\t\"OK\" - NC irá processar o bloqueio/desbloqueio\n  •\t\"ERROR\" - Ocorreu algum tipo de erro e NC não irá efetuar o bloqueio/desbloqueio",
+                                "example": "OK"
+                            },
+                            "errorCode": {
+                                "type": "string",
+                                "description": "Código do erro, caso status == \"ERROR\""
+                            },
+                            "errorMessage": {
+                                "type": "string",
+                                "description": "Mensagem de erro, caso status == \"ERROR\""
+                            }
+                        }
+                    }
+                }
+            },
+            "errorResponse": {
+                "type": "object",
+                "properties": {
+                    "apiVersion": {
+                        "type": "string",
+                        "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “1;2026-01-07”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+                        "example": "1;2026-01-07"
+                    },
+                    "transactionId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+                        "example": "b6195102-ea4f-44e8-fed5-386e4ec2a373"
+                    },
+                    "error": {
+                        "type": "object",
+                        "description": "Detalhes do erro ocorrido.",
+                        "properties": {
+                            "httpCode": {
+                                "type": "string",
+                                "description": "Código HTTP em formato string.",
+                                "example": "400"
+                            },
+                            "errorCode": {
+                                "type": "string",
+                                "description": "Código interno da API para o erro.",
+                                "example": "API-NCCOMFINANCIALBLOCKSORDERS-400"
+                            },
+                            "message": {
+                                "type": "string",
+                                "description": "Mensagem resumida do erro.",
+                                "example": "Bad Request."
+                            },
+                            "detailedMessage": {
+                                "type": "string",
+                                "description": "Mensagem detalhada do erro.",
+                                "example": "Bad Request."
+                            },
+                            "link": {
+                                "type": "object",
+                                "description": "Link relacionado ao erro.",
+                                "properties": {
+                                    "rel": {
+                                        "type": "string",
+                                        "description": "Relação do link com o recurso.",
+                                        "example": "related"
+                                    },
+                                    "href": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "description": "URL para documentação ou recurso relacionado.",
+                                        "example": "https://api.com.br/docs"
+                                    }
+                                },
+                                "required": [
+                                    "rel",
+                                    "href"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "httpCode",
+                            "errorCode",
+                            "message"
+                        ]
+                    }
+                },
+                "required": [
+                    "apiVersion",
+                    "transactionId",
+                    "error"
+                ]
+            },
+            "errorResponseCOM": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "description": "Resultado do processamento",
+                        "example": "ERROR"
+                    },
+                    "errorCode": {
+                        "type": "string",
+                        "description": "Código do erro, caso status == 'ERROR'",
+                        "example": "ERR-001"
+                    },
+                    "errorMessage": {
+                        "type": "string",
+                        "description": "Mensagem de erro, caso status == 'ERROR'",
+                        "example": "Mandatory fields missing"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "SucessResponse": {
+                "description": "Sucesso",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/FinancialBlocksResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373"
+                        }
+                    }
+                }
+            },
+            "BadRequest": {
+                "description": "Bad Request",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "oneOf": [
+                            {
+                            "$ref": "#/components/schemas/errorResponse"
+                            },
+                            {
+                            "$ref": "#/components/schemas/errorResponseCOM"
+                            }
+                            ]
+                        },
+                        "examples": {
+                            "BadRequest": {
+                                "value": {
+                                    "apiVersion": "1;2026-01-07",
+                                    "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                                    "error": {
+                                        "httpCode": "400",
+                                        "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-400",
+                                        "message": "Bad Request.",
+                                        "detailedMessage": "Bad Request.",
+                                        "link": {
+                                            "rel": "related",
+                                            "href": "https://api.claro.com.br/docs"
+                                        }
+                                    }
+                                }
+                            },
+                            "ContaCleNaoFound": {
+                                "value": {
+                                    "status": "ERROR",
+                                    "errorCode": "CLBR-COBE-0001",
+                                    "errorMessage": "ContaCle não foi localizada"
+                                }
+                            },
+                            "ContaNaoPertenceAoCNPJ": {
+                                "value": {
+                                    "status": "ERROR",
+                                    "errorCode": "CLBR-COBE-0002",
+                                    "errorMessage": "Conta informada não pertença ao CNPJ"
+                                }
+                            },
+                            "GenericError": {
+                                "value": {
+                                    "status": "ERROR",
+                                    "errorCode": "CLBR-COBE-0003",
+                                    "errorMessage": "{Codigo generico para erros durante processamento de integração.}"
+                                }
+                            },
+                            "GenericErrorCOM": {
+                                "value": {
+                                    "status": "ERROR",
+                                    "errorCode": "CLBR-COBE-0004",
+                                    "errorMessage": "{Codigo generico para erros durante a criação da Order no COM.}"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Unauthorized": {
+                "description": "Unauthorized",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "401",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-401",
+                                "message": "Unauthorized",
+                                "detailedMessage": "Unauthorized User",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Forbidden": {
+                "description": "Forbidden",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "403",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-403",
+                                "message": "Forbidden",
+                                "detailedMessage": "Access denied.",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "NotFound": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "404",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-404",
+                                "message": "Not found",
+                                "detailedMessage": "Resource not found",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "MethodNotAllowed": {
+                "description": "Method Not Allowed",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "405",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-405",
+                                "message": "Method Not Allowed",
+                                "detailedMessage": "Unavailable HTTP method",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "NotAcceptable": {
+                "description": "Request Not Acceptable",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "406",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-406",
+                                "message": "Request Not Acceptable",
+                                "detailedMessage": "Requested content type not acceptable",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "UnsupportedMediaType": {
+                "description": "Unsupported Media Type",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "415",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-415",
+                                "message": "Unsupported Media Type",
+                                "detailedMessage": "Unsupported request media type",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "UnprocessableEntity": {
+                "description": "Unprocessable Entity.\n",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "examples": {
+                            "UnprocessableEntity": {
+                                "summary": "Erro no processamento",
+                                "value": {
+                                    "apiVersion": "1;2026-01-07",
+                                    "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                                    "error": {
+                                        "httpCode": "422",
+                                        "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-001",
+                                        "message": "Unprocessable Entity",
+                                        "detailedMessage": "Unprocessable Entity",
+                                        "link": {
+                                            "rel": "related",
+                                            "href": "https://api.claro.com.br/docs"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "TooManyRequests": {
+                "description": "Too Many Requests",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "429",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-429",
+                                "message": "Too Many Requests",
+                                "detailedMessage": "Consumer requests exceeded policies",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "InternalServerError": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "500",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-500",
+                                "message": "Internal Server Error",
+                                "detailedMessage": "Internal server error",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "ServiceUnavailable": {
+                "description": "Service Unavailable",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/errorResponse"
+                        },
+                        "example": {
+                            "apiVersion": "1;2026-01-07",
+                            "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                            "error": {
+                                "httpCode": "503",
+                                "errorCode": "API-NCCOMFINANCIALBLOCKSORDERS-503",
+                                "message": "Service Unavailable",
+                                "detailedMessage": "Service Unavailable",
+                                "link": {
+                                    "rel": "related",
+                                    "href": "https://api.claro.com.br/docs"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

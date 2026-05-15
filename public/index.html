@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutomationBookTest | Stigma</title>
+  <link rel="icon" type="image/png" href="./assets/logo_stigma.png" />
+
+  <style>
+    :root {
+      --bg: #100f14;
+      --surface: #17151d;
+      --surface-2: #201d29;
+      --surface-3: #292532;
+      --text: #f6f2ff;
+      --muted: #b7aec7;
+      --line: #3a3347;
+      --orange: #ff7a18;
+      --pink: #e52e71;
+      --green: #32d583;
+      --red: #ff5a66;
+      --shadow: 0 22px 60px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        linear-gradient(120deg, rgba(255, 122, 24, 0.12), transparent 30%),
+        linear-gradient(300deg, rgba(229, 46, 113, 0.14), transparent 34%),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 28px 22px;
+      background: rgba(16, 15, 20, 0.92);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .brand-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav-title {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .metric-list,
+    .step-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .metric,
+    .step {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px;
+      color: var(--orange);
+    }
+
+    .metric span,
+    .step {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .step.active {
+      color: var(--text);
+      border-color: rgba(255, 122, 24, 0.7);
+      background: linear-gradient(90deg, rgba(255, 122, 24, 0.18), rgba(229, 46, 113, 0.10));
+    }
+
+    .main {
+      min-width: 0;
+      padding: 34px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 860px;
+      font-size: clamp(32px, 5vw, 64px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .panel {
+      margin-top: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(23, 21, 29, 0.86);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: var(--surface);
+    }
+
+    .panel-header h2,
+    .endpoint-title h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .panel-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label,
+    .section-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--text);
+      background: #0f0e13;
+      outline: none;
+    }
+
+    .field input {
+      height: 42px;
+      padding: 0 12px;
+    }
+
+    .field textarea {
+      min-height: 88px;
+      padding: 10px 12px;
+      resize: vertical;
+    }
+
+    .file-input {
+      padding-top: 9px;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.16);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      min-height: 40px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 0 15px;
+      color: #151018;
+      background: var(--orange);
+      font-weight: 800;
+    }
+
+    .btn:hover {
+      background: #ff9a3d;
+    }
+
+    .btn.secondary {
+      color: var(--text);
+      background: var(--surface-2);
+      border-color: var(--line);
+    }
+
+    .btn.secondary:hover {
+      border-color: var(--orange);
+    }
+
+    .btn.danger {
+      color: var(--text);
+      background: rgba(255, 90, 102, 0.15);
+      border-color: rgba(255, 90, 102, 0.45);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .notice {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .notice.error {
+      color: #ffd8dc;
+      border-color: rgba(255, 90, 102, 0.5);
+      background: rgba(255, 90, 102, 0.12);
+    }
+
+    .notice.success {
+      color: #d7ffe9;
+      border-color: rgba(50, 213, 131, 0.5);
+      background: rgba(50, 213, 131, 0.12);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .toolbar input {
+      width: min(360px, 100%);
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 12px;
+      color: var(--text);
+      background: #0f0e13;
+      outline: none;
+    }
+
+    .endpoint-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .endpoint-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .endpoint-card.disabled {
+      opacity: 0.62;
+    }
+
+    .endpoint-head {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .endpoint-title {
+      min-width: 0;
+    }
+
+    .method-path {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .method {
+      display: inline-flex;
+      height: 26px;
+      align-items: center;
+      border-radius: 4px;
+      padding: 0 8px;
+      background: rgba(255, 122, 24, 0.18);
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 8px;
+      color: var(--muted);
+      background: var(--surface-2);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.required {
+      color: #151018;
+      border-color: var(--orange);
+      background: var(--orange);
+    }
+
+    .badge.complexity-low {
+      color: #d7ffe9;
+      border-color: rgba(50, 213, 131, 0.5);
+      background: rgba(50, 213, 131, 0.12);
+    }
+
+    .badge.complexity-medium {
+      color: #ffe6c7;
+      border-color: rgba(255, 122, 24, 0.55);
+      background: rgba(255, 122, 24, 0.13);
+    }
+
+    .badge.complexity-high {
+      color: #ffd8dc;
+      border-color: rgba(255, 90, 102, 0.55);
+      background: rgba(255, 90, 102, 0.13);
+    }
+
+    .path {
+      min-width: 0;
+      color: var(--text);
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .endpoint-meta {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .endpoint-body {
+      padding: 16px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .endpoint-fields {
+      display: grid;
+      grid-template-columns: 1.4fr 0.7fr;
+      gap: 12px;
+    }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .choice {
+      min-height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 9px;
+      align-items: start;
+      background: var(--surface-2);
+    }
+
+    .choice input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--orange);
+      margin-top: 2px;
+    }
+
+    .choice input.param-value {
+      width: 100%;
+      height: 34px;
+      margin-top: 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--text);
+      background: #0f0e13;
+      accent-color: auto;
+    }
+
+    .choice strong {
+      display: block;
+      color: var(--text);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .choice span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .manual-scenarios {
+      display: grid;
+      gap: 10px;
+    }
+
+    .manual-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--surface-2);
+      display: grid;
+      gap: 10px;
+    }
+
+    .manual-card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .manual-card-head strong {
+      font-size: 13px;
+    }
+
+    .manual-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .summary-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-2);
+      padding: 14px;
+    }
+
+    .summary-item strong {
+      display: block;
+      color: var(--orange);
+      font-size: 28px;
+    }
+
+    .summary-item span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 980px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+
+      .form-grid,
+      .endpoint-fields,
+      .manual-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .main {
+        padding: 20px;
+      }
+
+      .panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./assets/logo_stigma.png" alt="Stigma" />
+        <div>
+          <h1 class="brand-title">Automation<br />Book Test</h1>
+          <p class="brand-subtitle">Gerador de CTs por Swagger</p>
+        </div>
+      </div>
+
+      <section>
+        <p class="nav-title">Fluxo</p>
+        <div class="step-list">
+          <div class="step active" id="step-config">1. Configurar entrada</div>
+          <div class="step" id="step-select">2. Selecionar cenários</div>
+          <div class="step" id="step-generate">3. Gerar caderno</div>
+        </div>
+      </section>
+
+      <section>
+        <p class="nav-title">Resumo</p>
+        <div class="metric-list">
+          <div class="metric">
+            <strong id="metricEndpoints">0</strong>
+            <span>endpoints selecionados</span>
+          </div>
+          <div class="metric">
+            <strong id="metricStatuses">0</strong>
+            <span>códigos de retorno</span>
+          </div>
+          <div class="metric">
+            <strong id="metricParams">0</strong>
+            <span>parâmetros selecionados</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <header class="hero">
+        <p class="eyebrow">Stigma Automation</p>
+        <h1>Monte um caderno só com os cenários que importam.</h1>
+        <p>
+          Importe ou carregue o Swagger, escolha endpoints, códigos de retorno e parâmetros obrigatórios ou opcionais antes de gerar o Excel.
+        </p>
+      </header>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Entrada</h2>
+            <p>Informe o usuário, o Swagger e o nome do arquivo de saída.</p>
+          </div>
+          <button class="btn secondary" id="resetBtn" type="button">Limpar</button>
+        </div>
+
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="zNumber">Número Z</label>
+              <input id="zNumber" placeholder="Z123456" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label for="swaggerFile">Arquivo Swagger</label>
+              <input id="swaggerFile" placeholder="account-nccomfinancialblocksorders-v1_260506.json" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label for="outputFileName">Nome do caderno</label>
+              <input id="outputFileName" value="Caderno_Casos_de_Testes.xlsx" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label for="baseUrl">URL base</label>
+              <input list="swagger-urls" id="baseUrl" placeholder="https://api-test.claro.com.br" autocomplete="off" />
+              <datalist id="swagger-urls"></datalist>
+            </div>
+
+            <div class="field">
+              <label for="swaggerUpload">Importar JSON do PC</label>
+              <input class="file-input" id="swaggerUpload" type="file" accept=".json,application/json" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn secondary" id="uploadBtn" type="button">Importar Swagger</button>
+            <button class="btn" id="loadBtn" type="button">Carregar Swagger</button>
+            <button class="btn secondary" id="fillDefaultsBtn" type="button">Usar exemplo</button>
+          </div>
+
+          <div class="notice" id="statusMessage">
+            A interface vai listar os endpoints, status codes, parâmetros obrigatórios, parâmetros opcionais e complexidade após carregar o Swagger.
+          </div>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="selectionPanel">
+        <div class="panel-header">
+          <div>
+            <h2>Seleção de cenários</h2>
+            <p>Escolha exatamente o que deve entrar no caderno.</p>
+          </div>
+          <div class="actions" style="margin-top: 0;">
+            <button class="btn secondary" id="selectAllBtn" type="button">Selecionar tudo</button>
+            <button class="btn secondary" id="clearAllBtn" type="button">Desmarcar tudo</button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <div class="toolbar">
+            <input id="endpointSearch" placeholder="Filtrar por endpoint ou método" />
+            <span class="section-label" id="endpointCount">0 endpoints carregados</span>
+          </div>
+
+          <div class="endpoint-list" id="endpointList"></div>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="generatePanel">
+        <div class="panel-header">
+          <div>
+            <h2>Resumo final</h2>
+            <p>Revise a seleção antes de gerar o arquivo.</p>
+          </div>
+          <button class="btn" id="generateBtn" type="button">Gerar Caderno</button>
+        </div>
+
+        <div class="panel-body">
+          <div class="summary-grid">
+            <div class="summary-item">
+              <strong id="summaryEndpoints">0</strong>
+              <span>endpoints</span>
+            </div>
+            <div class="summary-item">
+              <strong id="summaryStatuses">0</strong>
+              <span>status codes</span>
+            </div>
+            <div class="summary-item">
+              <strong id="summaryParams">0</strong>
+              <span>parâmetros</span>
+            </div>
+            <div class="summary-item">
+              <strong id="summaryCases">0</strong>
+              <span>estimativa de CTs</span>
+            </div>
+          </div>
+
+          <div class="notice" id="generateMessage">
+            Configure pelo menos um endpoint para liberar a geração.
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      endpoints: [],
+      servers: [],
+      userEmail: "",
+      swaggerFile: "",
+      downloadUrl: "",
+    };
+
+    const elements = {
+      zNumber: document.getElementById("zNumber"),
+      swaggerFile: document.getElementById("swaggerFile"),
+      swaggerUpload: document.getElementById("swaggerUpload"),
+      outputFileName: document.getElementById("outputFileName"),
+      baseUrl: document.getElementById("baseUrl"),
+      swaggerUrls: document.getElementById("swagger-urls"),
+      uploadBtn: document.getElementById("uploadBtn"),
+      loadBtn: document.getElementById("loadBtn"),
+      fillDefaultsBtn: document.getElementById("fillDefaultsBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      statusMessage: document.getElementById("statusMessage"),
+      selectionPanel: document.getElementById("selectionPanel"),
+      generatePanel: document.getElementById("generatePanel"),
+      endpointList: document.getElementById("endpointList"),
+      endpointSearch: document.getElementById("endpointSearch"),
+      endpointCount: document.getElementById("endpointCount"),
+      selectAllBtn: document.getElementById("selectAllBtn"),
+      clearAllBtn: document.getElementById("clearAllBtn"),
+      generateBtn: document.getElementById("generateBtn"),
+      generateMessage: document.getElementById("generateMessage"),
+      metricEndpoints: document.getElementById("metricEndpoints"),
+      metricStatuses: document.getElementById("metricStatuses"),
+      metricParams: document.getElementById("metricParams"),
+      summaryEndpoints: document.getElementById("summaryEndpoints"),
+      summaryStatuses: document.getElementById("summaryStatuses"),
+      summaryParams: document.getElementById("summaryParams"),
+      summaryCases: document.getElementById("summaryCases"),
+      stepConfig: document.getElementById("step-config"),
+      stepSelect: document.getElementById("step-select"),
+      stepGenerate: document.getElementById("step-generate"),
+    };
+
+    function setMessage(message, type = "") {
+      elements.statusMessage.className = `notice ${type}`.trim();
+      elements.statusMessage.textContent = message;
+    }
+
+    function setGenerateMessage(message, type = "") {
+      elements.generateMessage.className = `notice ${type}`.trim();
+      elements.generateMessage.textContent = message;
+    }
+
+    function setGenerateDownloadMessage(fileName, downloadUrl) {
+      elements.generateMessage.className = "notice success";
+      elements.generateMessage.innerHTML = `
+        Caderno gerado com sucesso.
+        <a href="${downloadUrl}" download="${escapeHtml(fileName)}" style="color: inherit; font-weight: 800; text-decoration: underline;">
+          Clique aqui para baixar novamente
+        </a>.
+      `;
+    }
+
+    function setStep(step) {
+      elements.stepConfig.classList.toggle("active", step === "config");
+      elements.stepSelect.classList.toggle("active", step === "select");
+      elements.stepGenerate.classList.toggle("active", step === "generate");
+    }
+
+    function endpointKey(endpoint) {
+      return `${endpoint.method}:${endpoint.path}`;
+    }
+
+    function normalizeServerUrl(url) {
+      return String(url || "").replace(/\/+$/g, "");
+    }
+
+    function buildEndpointUrl(path) {
+      const baseUrl = normalizeServerUrl(elements.baseUrl.value);
+
+      if (!baseUrl) {
+        return path;
+      }
+
+      return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+    }
+
+    function renderServerOptions() {
+      elements.swaggerUrls.innerHTML = state.servers
+        .map((server) => `
+          <option value="${escapeHtml(server.url)}">${escapeHtml(server.description || server.url)}</option>
+        `)
+        .join("");
+    }
+
+    function normalizeEndpoint(endpoint, index) {
+      const params = endpoint.params || endpoint.mandatoryParams || [];
+
+      return {
+        ...endpoint,
+        params,
+        id: endpointKey(endpoint),
+        selected: true,
+        url: "",
+        displayText: endpoint.summary || endpoint.description || "Sem resumo no Swagger",
+        summary: `API-CT-${String(index + 1).padStart(3, "0")}`,
+        paramValues: Object.fromEntries(params.map((item) => [item.name, ""])),
+        extraScenarios: [],
+        selectedStatusCodes: new Set((endpoint.statusCodes || []).map((item) => item.statusCode)),
+        selectedMandatoryParams: new Set(params.filter((item) => item.required).map((item) => item.name)),
+      };
+    }
+
+    function complexityClass(complexity) {
+      const normalized = String(complexity || "").toLowerCase();
+
+      if (normalized.includes("alta")) {
+        return "complexity-high";
+      }
+
+      if (normalized.includes("media")) {
+        return "complexity-medium";
+      }
+
+      return "complexity-low";
+    }
+
+    function visibleEndpoints() {
+      const query = elements.endpointSearch.value.trim().toLowerCase();
+
+      if (!query) {
+        return state.endpoints;
+      }
+
+      return state.endpoints.filter((endpoint) => {
+        return `${endpoint.method} ${endpoint.path}`.toLowerCase().includes(query);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getApiError(data, fallback) {
+      if (typeof data?.error === "string") {
+        return data.error;
+      }
+
+      if (data?.error?.message) {
+        return data.error.message;
+      }
+
+      return fallback;
+    }
+
+    async function readJsonResponse(response, fallbackMessage) {
+      const contentType = response.headers.get("content-type") || "";
+      const text = await response.text();
+
+      if (!text.trim()) {
+        throw new Error(`${fallbackMessage} O servidor retornou uma resposta vazia.`);
+      }
+
+      if (!contentType.includes("application/json")) {
+        throw new Error(`${fallbackMessage} Resposta inesperada do servidor: ${text.slice(0, 180)}`);
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        throw new Error(`${fallbackMessage} Não foi possível ler a resposta do servidor: ${error.message}`);
+      }
+    }
+
+    function parseJsonFileFallback(file) {
+      return new Promise((resolve, reject) => {
+        window.setTimeout(async () => {
+          try {
+            const content = (await file.text()).replace(/^\uFEFF/, "").trim();
+            JSON.parse(content);
+            resolve(content);
+          } catch (error) {
+            reject(new Error(`O arquivo selecionado não contém um JSON válido: ${error.message}`));
+          }
+        }, 0);
+      });
+    }
+
+    function parseJsonFileAsync(file) {
+      if (!window.Worker) {
+        return parseJsonFileFallback(file);
+      }
+
+      return new Promise((resolve, reject) => {
+        const workerSource = `
+          self.onmessage = async (event) => {
+            try {
+              const content = (await event.data.file.text()).replace(/^\\uFEFF/, "").trim();
+              JSON.parse(content);
+              self.postMessage({ success: true, content });
+            } catch (error) {
+              self.postMessage({
+                success: false,
+                error: "O arquivo selecionado não contém um JSON válido: " + error.message,
+              });
+            }
+          };
+        `;
+
+        const workerUrl = URL.createObjectURL(new Blob([workerSource], { type: "text/javascript" }));
+        const worker = new Worker(workerUrl);
+
+        worker.onmessage = (event) => {
+          URL.revokeObjectURL(workerUrl);
+          worker.terminate();
+
+          if (event.data.success) {
+            resolve(event.data.content);
+          } else {
+            reject(new Error(event.data.error));
+          }
+        };
+
+        worker.onerror = (error) => {
+          URL.revokeObjectURL(workerUrl);
+          worker.terminate();
+          reject(new Error(`Erro ao processar o JSON: ${error.message}`));
+        };
+
+        worker.postMessage({ file });
+      });
+    }
+
+    function estimateCases(endpoint) {
+      if (!endpoint.selected) {
+        return 0;
+      }
+
+      let total = 0;
+
+      for (const statusCode of endpoint.selectedStatusCodes) {
+        const status = endpoint.statusCodes.find((item) => item.statusCode === statusCode);
+        const exampleCount = Math.max(status?.exampleKeys?.length || 0, 1);
+
+        if (statusCode === "400" || statusCode === "422") {
+          total += Math.max(endpoint.selectedMandatoryParams.size, 1) * exampleCount;
+        } else {
+          total += exampleCount;
+        }
+      }
+
+      return total + (endpoint.extraScenarios?.length || 0);
+    }
+
+    function getSummary() {
+      const selected = state.endpoints.filter((endpoint) => endpoint.selected);
+      const statuses = selected.reduce((acc, endpoint) => acc + endpoint.selectedStatusCodes.size, 0);
+      const params = selected.reduce((acc, endpoint) => acc + endpoint.selectedMandatoryParams.size, 0);
+      const cases = selected.reduce((acc, endpoint) => acc + estimateCases(endpoint), 0);
+
+      return {
+        endpoints: selected.length,
+        statuses,
+        params,
+        cases,
+      };
+    }
+
+    function updateSummary() {
+      const summary = getSummary();
+
+      elements.metricEndpoints.textContent = summary.endpoints;
+      elements.metricStatuses.textContent = summary.statuses;
+      elements.metricParams.textContent = summary.params;
+      elements.summaryEndpoints.textContent = summary.endpoints;
+      elements.summaryStatuses.textContent = summary.statuses;
+      elements.summaryParams.textContent = summary.params;
+      elements.summaryCases.textContent = summary.cases;
+      elements.generateBtn.disabled = summary.endpoints === 0 || summary.statuses === 0;
+
+      if (summary.endpoints === 0) {
+        setGenerateMessage("Selecione pelo menos um endpoint.", "");
+      } else if (summary.statuses === 0) {
+        setGenerateMessage("Selecione pelo menos um código de retorno.", "");
+      } else {
+        setGenerateMessage(`Pronto para gerar aproximadamente ${summary.cases} caso(s) de teste.`, "success");
+      }
+    }
+
+    function renderEndpoints() {
+      const endpoints = visibleEndpoints();
+      elements.endpointList.innerHTML = "";
+      elements.endpointCount.textContent = `${endpoints.length} de ${state.endpoints.length} endpoints`;
+
+      if (!endpoints.length) {
+        elements.endpointList.innerHTML = '<div class="empty">Nenhum endpoint encontrado para esse filtro.</div>';
+        updateSummary();
+        return;
+      }
+
+      for (const endpoint of endpoints) {
+        const card = document.createElement("article");
+        card.className = `endpoint-card ${endpoint.selected ? "" : "disabled"}`.trim();
+        card.dataset.endpointId = endpoint.id;
+
+        const statusChoices = (endpoint.statusCodes || []).map((status) => `
+          <label class="choice">
+            <input
+              type="checkbox"
+              data-role="status"
+              data-status="${escapeHtml(status.statusCode)}"
+              ${endpoint.selectedStatusCodes.has(status.statusCode) ? "checked" : ""}
+            />
+            <span>
+              <strong>${escapeHtml(status.statusCode)} ${escapeHtml(status.description || "")}</strong>
+              <span>${status.hasBody ? "Response body documentado" : "Sem body documentado"}${status.exampleKeys?.length ? ` · ${status.exampleKeys.length} example(s)` : ""}</span>
+            </span>
+          </label>
+        `).join("");
+
+        const paramChoices = (endpoint.params || []).map((param) => `
+          <label class="choice">
+            <input
+              type="checkbox"
+              data-role="param"
+              data-param="${escapeHtml(param.name)}"
+              ${endpoint.selectedMandatoryParams.has(param.name) ? "checked" : ""}
+            />
+            <span>
+              <strong>${escapeHtml(param.name)}</strong>
+              <span>
+                <span class="badge ${param.required ? "required" : ""}">${param.required ? "Obrigatório" : "Opcional"}</span>
+                ${escapeHtml(param.in || "body")}${param.description ? ` · ${escapeHtml(param.description)}` : ""}
+              </span>
+              <input
+                class="param-value"
+                type="text"
+                data-role="param-value"
+                data-param="${escapeHtml(param.name)}"
+                value="${escapeHtml(endpoint.paramValues?.[param.name] || "")}"
+                placeholder="Digite a massa de dados"
+              />
+            </span>
+          </label>
+        `).join("");
+
+        const manualScenarios = (endpoint.extraScenarios || []).map((scenario, scenarioIndex) => `
+          <div class="manual-card" data-extra-index="${scenarioIndex}">
+            <div class="manual-card-head">
+              <strong>Cenário extra ${scenarioIndex + 1}</strong>
+              <button class="btn danger" type="button" data-role="remove-extra" data-extra-index="${scenarioIndex}">Remover</button>
+            </div>
+            <div class="manual-grid">
+              <div class="field">
+                <label>description</label>
+                <textarea data-role="extra-description" data-extra-index="${scenarioIndex}" placeholder="Descrição do cenário manual">${escapeHtml(scenario.description)}</textarea>
+              </div>
+              <div class="field">
+                <label>step_description</label>
+                <textarea data-role="extra-step" data-extra-index="${scenarioIndex}" placeholder="Passos do cenário manual">${escapeHtml(scenario.stepDescription)}</textarea>
+              </div>
+            </div>
+          </div>
+        `).join("");
+
+        card.innerHTML = `
+          <div class="endpoint-head">
+            <input type="checkbox" data-role="endpoint" ${endpoint.selected ? "checked" : ""} />
+            <div class="endpoint-title">
+              <div class="method-path">
+                <span class="method">${escapeHtml(endpoint.method)}</span>
+                <span class="badge ${complexityClass(endpoint.complexity)}">${escapeHtml(endpoint.complexity || "Baixa complexidade")}</span>
+                <span class="path">${escapeHtml(endpoint.path)}</span>
+              </div>
+              <p class="endpoint-meta">${escapeHtml(endpoint.displayText)} · ${endpoint.requiredParamCount || 0} obrigatório(s)</p>
+            </div>
+          </div>
+
+          <div class="endpoint-body">
+            <div class="endpoint-fields">
+              <div class="field">
+                <label>URL completa</label>
+                <input data-role="url" value="${escapeHtml(endpoint.url)}" placeholder="${escapeHtml(buildEndpointUrl(endpoint.path))}" />
+              </div>
+
+              <div class="field">
+                <label>Nome no caderno</label>
+                <input data-role="summary" value="${escapeHtml(endpoint.summary)}" placeholder="API-CT-001" />
+              </div>
+            </div>
+
+            <div>
+              <p class="section-label">Códigos de retorno</p>
+              <div class="choice-grid">${statusChoices || '<div class="empty">Nenhum response documentado.</div>'}</div>
+            </div>
+
+            <div>
+              <p class="section-label">Parâmetros e massa de dados</p>
+              <div class="choice-grid">${paramChoices || '<div class="empty">Nenhum parâmetro encontrado.</div>'}</div>
+            </div>
+
+            <div>
+              <div class="actions" style="margin-top: 0;">
+                <button class="btn secondary" type="button" data-role="add-extra">+ Adicionar Cenário Extra</button>
+              </div>
+              <div class="manual-scenarios">${manualScenarios}</div>
+            </div>
+          </div>
+        `;
+
+        elements.endpointList.appendChild(card);
+      }
+
+      updateSummary();
+    }
+
+    async function loadSwagger() {
+      const zNumber = elements.zNumber.value.trim().toUpperCase();
+      const swaggerFile = elements.swaggerFile.value.trim();
+
+      if (!zNumber || !swaggerFile) {
+        setMessage("Informe o número Z e o arquivo Swagger antes de carregar.", "error");
+        return;
+      }
+
+      elements.zNumber.value = zNumber;
+      state.userEmail = `${zNumber}@claro.com.br`;
+      state.swaggerFile = swaggerFile;
+
+      elements.loadBtn.disabled = true;
+      setMessage("Analisando Swagger e extraindo endpoints, responses e parâmetros obrigatórios...");
+
+      try {
+        const response = await fetch("/load-swagger", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ swaggerFile }),
+        });
+
+        const data = await readJsonResponse(response, "Erro ao carregar Swagger.");
+
+        if (!response.ok || !data.success) {
+          throw new Error(getApiError(data, "Erro ao carregar Swagger."));
+        }
+
+        state.servers = data.servers || [];
+        renderServerOptions();
+
+        if (!elements.baseUrl.value.trim() && state.servers.length) {
+          elements.baseUrl.value = state.servers[0].url;
+        }
+
+        state.endpoints = data.endpoints.map(normalizeEndpoint);
+        elements.selectionPanel.classList.remove("hidden");
+        elements.generatePanel.classList.remove("hidden");
+        setStep("select");
+        setMessage(`Swagger carregado para ${state.userEmail}. ${state.endpoints.length} endpoint(s) encontrados.`, "success");
+        renderEndpoints();
+      } catch (error) {
+        console.error(error);
+        setMessage(error.message || "Erro ao carregar Swagger.", "error");
+      } finally {
+        elements.loadBtn.disabled = false;
+      }
+    }
+
+    function buildMethodConfigs() {
+      return state.endpoints
+        .filter((endpoint) => endpoint.selected)
+        .map((endpoint) => ({
+          method: endpoint.method,
+          path: endpoint.path,
+          url: endpoint.url.trim() || buildEndpointUrl(endpoint.path),
+          summary: endpoint.summary.trim() || "API-CT",
+          operationTitle: endpoint.displayText,
+          baseUrl: elements.baseUrl.value.trim(),
+          paramValues: endpoint.paramValues || {},
+          extraScenarios: endpoint.extraScenarios || [],
+          statusCodes: Array.from(endpoint.selectedStatusCodes),
+          mandatoryParams: Array.from(endpoint.selectedMandatoryParams),
+          complexity: endpoint.complexity,
+        }))
+        .filter((config) => config.statusCodes.length > 0);
+    }
+
+    async function uploadSwagger() {
+      const file = elements.swaggerUpload.files?.[0];
+
+      if (!file) {
+        setMessage("Escolha um arquivo JSON do seu PC antes de importar.", "error");
+        return;
+      }
+
+      elements.uploadBtn.disabled = true;
+      setMessage("Importando Swagger para a pasta documentation...");
+
+      try {
+        const content = await parseJsonFileAsync(file);
+
+        const response = await fetch("/upload-swagger", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fileName: file.name,
+            content,
+          }),
+        });
+
+        const data = await readJsonResponse(response, "Erro ao importar Swagger.");
+
+        if (!response.ok || !data.success) {
+          throw new Error(getApiError(data, "Erro ao importar Swagger."));
+        }
+
+        elements.swaggerFile.value = data.swaggerFile;
+        state.swaggerFile = data.swaggerFile;
+        setMessage(`Swagger importado como ${data.swaggerFile}. Agora clique em Carregar Swagger.`, "success");
+      } catch (error) {
+        console.error(error);
+        setMessage(error.message || "Erro ao importar Swagger.", "error");
+      } finally {
+        elements.uploadBtn.disabled = false;
+      }
+    }
+
+    async function generateExcel() {
+      const methodConfigs = buildMethodConfigs();
+
+      if (!methodConfigs.length) {
+        setGenerateMessage("Selecione pelo menos um endpoint com status code.", "error");
+        return;
+      }
+
+      elements.generateBtn.disabled = true;
+      setStep("generate");
+      setGenerateMessage("Gerando planilha com os filtros selecionados...");
+
+      try {
+        const response = await fetch("/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            swaggerFile: state.swaggerFile,
+            userEmail: state.userEmail,
+            outputFileName: elements.outputFileName.value.trim(),
+            methodConfigs,
+          }),
+        });
+
+        if (!response.ok) {
+          const data = await readJsonResponse(response, "Erro ao gerar Excel.");
+          throw new Error(getApiError(data, "Erro ao gerar Excel."));
+        }
+
+        const blob = await response.blob();
+
+        if (!blob.size) {
+          throw new Error("O servidor gerou uma resposta vazia para o Excel.");
+        }
+
+        if (state.downloadUrl) {
+          window.URL.revokeObjectURL(state.downloadUrl);
+        }
+
+        const url = window.URL.createObjectURL(blob);
+        state.downloadUrl = url;
+        const fileName = elements.outputFileName.value.trim() || "Caderno_Casos_de_Testes.xlsx";
+        const downloadFileName = fileName.toLowerCase().endsWith(".xlsx") ? fileName : `${fileName}.xlsx`;
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = downloadFileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setGenerateDownloadMessage(downloadFileName, url);
+      } catch (error) {
+        console.error(error);
+        setGenerateMessage(error.message || "Erro ao gerar Excel.", "error");
+      } finally {
+        elements.generateBtn.disabled = false;
+        updateSummary();
+      }
+    }
+
+    window.__automationBookController?.abort();
+    window.__automationBookController = new AbortController();
+    const listenerOptions = {
+      signal: window.__automationBookController.signal,
+    };
+
+    elements.uploadBtn.addEventListener("click", uploadSwagger, listenerOptions);
+
+    elements.loadBtn.addEventListener("click", loadSwagger, listenerOptions);
+
+    elements.fillDefaultsBtn.addEventListener("click", () => {
+      elements.zNumber.value = "Z123456";
+      elements.swaggerFile.value = "account-nccomfinancialblocksorders-v1_260506.json";
+      elements.outputFileName.value = "Caderno_Financial_Blocks.xlsx";
+      elements.baseUrl.value = "";
+    }, listenerOptions);
+
+    elements.resetBtn.addEventListener("click", () => {
+      state.endpoints = [];
+      state.servers = [];
+      state.userEmail = "";
+      state.swaggerFile = "";
+      if (state.downloadUrl) {
+        window.URL.revokeObjectURL(state.downloadUrl);
+      }
+      state.downloadUrl = "";
+      elements.zNumber.value = "";
+      elements.swaggerFile.value = "";
+      elements.swaggerUpload.value = "";
+      elements.outputFileName.value = "Caderno_Casos_de_Testes.xlsx";
+      elements.baseUrl.value = "";
+      elements.swaggerUrls.innerHTML = "";
+      elements.endpointSearch.value = "";
+      elements.selectionPanel.classList.add("hidden");
+      elements.generatePanel.classList.add("hidden");
+      elements.endpointList.innerHTML = "";
+      setStep("config");
+      setMessage("A interface vai listar os endpoints, status codes, parâmetros obrigatórios, parâmetros opcionais e complexidade após carregar o Swagger.");
+      updateSummary();
+    }, listenerOptions);
+
+    elements.endpointSearch.addEventListener("input", renderEndpoints, listenerOptions);
+
+    elements.baseUrl.addEventListener("input", renderEndpoints, listenerOptions);
+
+    elements.selectAllBtn.addEventListener("click", () => {
+      for (const endpoint of state.endpoints) {
+        endpoint.selected = true;
+        endpoint.selectedStatusCodes = new Set((endpoint.statusCodes || []).map((item) => item.statusCode));
+        endpoint.selectedMandatoryParams = new Set((endpoint.params || []).map((item) => item.name));
+      }
+
+      renderEndpoints();
+    }, listenerOptions);
+
+    elements.clearAllBtn.addEventListener("click", () => {
+      for (const endpoint of state.endpoints) {
+        endpoint.selected = false;
+      }
+
+      renderEndpoints();
+    }, listenerOptions);
+
+    elements.endpointList.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-role]");
+
+      if (!button) {
+        return;
+      }
+
+      const card = button.closest(".endpoint-card");
+
+      if (!card) {
+        return;
+      }
+
+      const endpoint = state.endpoints.find((item) => item.id === card.dataset.endpointId);
+
+      if (!endpoint) {
+        return;
+      }
+
+      const role = button.dataset.role;
+
+      if (role === "add-extra") {
+        endpoint.extraScenarios.push({
+          description: "",
+          stepDescription: "",
+        });
+        renderEndpoints();
+      }
+
+      if (role === "remove-extra") {
+        const extraIndex = Number(button.dataset.extraIndex);
+        endpoint.extraScenarios.splice(extraIndex, 1);
+        renderEndpoints();
+      }
+    }, listenerOptions);
+
+    elements.endpointList.addEventListener("input", (event) => {
+      const card = event.target.closest(".endpoint-card");
+
+      if (!card) {
+        return;
+      }
+
+      const endpoint = state.endpoints.find((item) => item.id === card.dataset.endpointId);
+
+      if (!endpoint) {
+        return;
+      }
+
+      const role = event.target.dataset.role;
+
+      if (role === "endpoint") {
+        endpoint.selected = event.target.checked;
+      }
+
+      if (role === "url") {
+        endpoint.url = event.target.value;
+      }
+
+      if (role === "summary") {
+        endpoint.summary = event.target.value;
+      }
+
+      if (role === "status") {
+        if (event.target.checked) {
+          endpoint.selectedStatusCodes.add(event.target.dataset.status);
+        } else {
+          endpoint.selectedStatusCodes.delete(event.target.dataset.status);
+        }
+      }
+
+      if (role === "param") {
+        if (event.target.checked) {
+          endpoint.selectedMandatoryParams.add(event.target.dataset.param);
+        } else {
+          endpoint.selectedMandatoryParams.delete(event.target.dataset.param);
+        }
+      }
+
+      if (role === "param-value") {
+        endpoint.paramValues[event.target.dataset.param] = event.target.value;
+      }
+
+      if (role === "extra-description") {
+        const extraIndex = Number(event.target.dataset.extraIndex);
+        endpoint.extraScenarios[extraIndex].description = event.target.value;
+      }
+
+      if (role === "extra-step") {
+        const extraIndex = Number(event.target.dataset.extraIndex);
+        endpoint.extraScenarios[extraIndex].stepDescription = event.target.value;
+      }
+
+      updateSummary();
+      card.classList.toggle("disabled", !endpoint.selected);
+    }, listenerOptions);
+
+    elements.generateBtn.addEventListener("click", generateExcel, listenerOptions);
+
+    updateSummary();
+  </script>
+</body>
+</html>

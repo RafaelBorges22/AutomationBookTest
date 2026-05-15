@@ -1,0 +1,2278 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Communication Management",
+    "description": "API para envio de SMS e email. Atualmente, envio de SMS está funcional apenas para clientes ativos da Móvel. <table><thead><tr><th>Versão</th><th>Elaborado por</th><th>Data</th><th>Alterações</th></tr></thead><tbody><tr><td>1.0.0</td><td>Guilherme Sardiva</td><td>2019-03-07</td><td>[CEC] Versão inicial - Baseado no TMF681</td></tr><tr><td>1.0.1</td><td>Rafael Pancher</td><td>2019-07-25</td><td>[MinhaClaro Novo APP] Adicionados exemplos de preenchimento e domínios de atributos. Ajustados valores de'type', conforme implementação.</td></tr><tr><td>1.1.0</td><td>Fabio Z Guijarro</td><td>2019-04-23</td><td>[FaturaDigital - Envio de Push] Ajustado para envio de notificacao Push. Incluídos atributos'targetApplication' e 'characteristic'.</td></tr><tr><td>1.1.1</td><td>Fabio Z Guijarro</td><td>2019-05-14</td><td>[FaturaDigital - Envio de Push] Substituído atributo 'targetApplication' por 'costCenter' e depreciado'characteristic' em favor de 'pushParameters'.</td></tr><tr><td>1.2.0</td><td>Leandro Rodrigues</td><td>2019-09-10</td><td>[E-Commerce] Adicionado objetos communicationPostSalesRequest e communicationMessageSendSalesResponse /estrutura oneOf.</td></tr><tr><td>1.3.0</td><td>Leandro Rodrigues</td><td>2019-11-05</td><td>[Cadastro ABR] Adicionado objetos communicationPostQuizRequest e communicationPostQuizResponse.</td></tr><tr><td>1.4.0</td><td>Leandro Rodrigues</td><td>2020-02-10</td><td>[E-Commerce] Inclusão dos objetos communicationPostSalesShoppingCartRequest ecommunicationPostSalesShoppingCartResponse para tratamento de carrinho de compras no fluxo SALES.</td></tr><tr><td>1.4.1</td><td>Raphael Rossi</td><td>2020-08-25</td><td>[Apigee] Ajuste para o apigee</td></tr><tr><td>1.5.1</td><td>André Teixeira</td><td>2021-02-25</td><td>[Apigee] Inclusão de novos parâmetros de entrada no fluxo de SALES e ShoppingCarts.</td></tr><td>1.6.1</td><td>André Teixeira</td><td>2021-02-25</td><td>[Apigee] Inclusão de novos parâmetros de entrada no fluxo de SALES e ShoppingCarts referente a aparelho.</td></tr><tr><td>1.6.2</td><td>Elcio Rosa</td><td>2021-07-07</td><td>[E-Commerce] Adição dos campos prezaoPromotion e dependentList no fluxo SALES.</td></td></tr><tr><td>1.6.3</td><td>Gabriel E. Joioso</td><td>2025-07-15</td><td>[DDP-154409] Inclusão de validação dos campos obrigatórios 'neighborhood' e 'stateAbbreviation' quando for informado layoutId = 'ecommerce_pedido_sucesso', serviceChannel = 'EMAIL' e type = 'SALES' no request.</td></tr></tbody></table>",
+    "version": "1;2025-07-15",
+    "contact": {
+      "name": "CC-Integração",
+      "email": "coee.api.integracao@claro.com.br"
+    },
+    "x-claro-domains": [
+      "Communication"
+    ]
+  },
+  "security": [
+    {
+      "x-client-auth": [],
+      "x-client-key": [],
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/communicationmanagements": {
+      "post": {
+        "summary": "Enviar a mensagem (SMS, Email, ou mobile app push notification) para o destinatário informado, por meio de aplicações internas da Móvel (MSE, SMTP) e RTDM. Atualmente, envio de SMS (exceto Quiz) está funcional apenas para clientes ativos da Móvel. Backends: SOA Móvel EnviarSmsv1, EnviarEmailv1, ConsultarUltimoAssinantev1, WOA Móvel sms/enviar (inativo), RTDM (push, Sales, Quiz).",
+        "description": "Enviar a mensagem (SMS, Email, ou mobile app push notification) para o destinatário informado, por meio de aplicações internas da Móvel (MSE, SMTP) e RTDM. \n\nPara degustação desta API (ambiente: sandbox):\n\n1) clique no botão [Authorize], no canto superior direito da página\n\n2) em seguida, preencha o campo 'Api Key Auth: Basic Auth: x-client-auth com os seguintes valores:\n\n    **Username**: fDezjYMcrR151auaORVo2GEKGAUI6uww\n    \n    **Password**: 8Gz9Yj7TEpaRnUB5\n  \n3) Clique no botão [OK]",
+        "parameters": [
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "Header com a definição da versão da API a ser consumida",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Metadata",
+            "in": "header",
+            "description": "Header que define a necessidade do campo metadata no response. Permitido \"true\" ou \"false\".",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "communicationMessage"
+        ],
+        "responses": {
+          "200": {
+            "description": "Objeto de negócio contendo os dados retornados pela API caso existam.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/communicationMessageSendResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/communicationMessageSendSalesResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/communicationMessageSendQuizResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/communicationMessageSendSalesShoppingCartResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "communicationMessageEmailSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "72262b3e-5743-4f1b-9986-4c87bbc08b62",
+                      "data": {
+                        "message": {
+                          "id": "brux1079-192-168-0-45!572a1c0e-84d6-49b7-8865-5652c2bd074c"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessagePushSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "9df6d48c-c84e-42c6-9618-b0c97d4068c2",
+                      "data": {
+                        "statusRTDM": "RTDM00",
+                        "RTC": "996680703",
+                        "TTC": null,
+                        "statusFluxo": "DISPARO ENVIADO"
+                      }
+                    }
+                  },
+                  "communicationMessageQuizSendResponse": {
+                    "value": {
+                      "apiversion": "1;2020-08-25",
+                      "transactionId": "3b3c0e1a-2a4f-446b-b913-65aeca5a2878",
+                      "data": {
+                        "statusCode": "RTDM00",
+                        "statusDescription": "Execução com Sucesso",
+                        "resultCode": "0",
+                        "resultDescription": "Mensagem enviada"
+                      }
+                    }
+                  },
+                  "communicationMessageSalesSendResponse": {
+                    "value": {
+                      "apiversion": "1;2020-08-25",
+                      "transactionId": "32ad7583-cec0-4857-b62c-d006e25fb579",
+                      "data": {
+                        "statusCode": "RTDM00",
+                        "telephoneNumber": "5511911111111",
+                        "customerOrderId": "000009919852",
+                        "token": "6197"
+                      }
+                    }
+                  },
+                  "communicationMessageShoppingCartSendResponse": {
+                    "value": {
+                      "apiversion": "1;2020-08-25",
+                      "transactionId": "79d5623a-4c4b-4d87-a32a-255de8508929",
+                      "data": {
+                        "statusCode": "RTDM00",
+                        "telephoneNumber": "5511911111111"
+                      }
+                    }
+                  },
+                  "communicationMessageSmsSoaSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "1307529e-e310-4f9b-b4f2-a6dd8890143c",
+                      "data": {
+                        "message": {
+                          "id": "111111111"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageSmsWoaSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "88c762e3-f1e0-4a88-b7d3-132103202827",
+                      "data": {
+                        "menssage": {
+                          "id": "111111111111"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/communicationMessageSendResponse"
+                }
+              },
+              "application/javascript": {
+                "schema": {
+                  "$ref": "#/components/schemas/communicationMessageSendResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "examples": {
+                  "communicationMessageEmailSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "cb559b11-a3cd-4cb9-b12a-31aa91f53f1f",
+                      "error": {
+                        "httpCode": "400",
+                        "errorCode": "API-COMMSG-001",
+                        "message": "Bad Request",
+                        "detailedMessage": "Bad Request",
+                        "link": {
+                          "href": "https://api.claro.com.br/docs/error_codes.html",
+                          "rel": "related"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessagePushSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "cb559b11-a3cd-4cb9-b12a-31aa91f53f1f",
+                      "error": {
+                        "httpCode": "400",
+                        "errorCode": "API-COMMSG-001",
+                        "message": "Bad Request",
+                        "detailedMessage": "Bad Request",
+                        "link": {
+                          "href": "https://api.claro.com.br/docs/error_codes.html",
+                          "rel": "related"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageQuizSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "cb559b11-a3cd-4cb9-b12a-31aa91f53f1f",
+                      "error": {
+                        "httpCode": "400",
+                        "errorCode": "API-COMMSG-001",
+                        "message": "Bad Request",
+                        "detailedMessage": "Bad Request",
+                        "link": {
+                          "href": "https://api.claro.com.br/docs/error_codes.html",
+                          "rel": "related"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageSalesSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "cb559b11-a3cd-4cb9-b12a-31aa91f53f1f",
+                      "error": {
+                        "httpCode": "400",
+                        "errorCode": "API-COMMSG-001",
+                        "message": "Bad Request",
+                        "detailedMessage": "Bad Request",
+                        "link": {
+                          "href": "https://api.claro.com.br/docs/error_codes.html",
+                          "rel": "related"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageShoppingCartSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "cb559b11-a3cd-4cb9-b12a-31aa91f53f1f",
+                      "error": {
+                        "httpCode": "400",
+                        "errorCode": "API-COMMSG-001",
+                        "message": "Bad Request",
+                        "detailedMessage": "Bad Request",
+                        "link": {
+                          "href": "https://api.claro.com.br/docs/error_codes.html",
+                          "rel": "related"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageSmsSoaSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "cb559b11-a3cd-4cb9-b12a-31aa91f53f1f",
+                      "error": {
+                        "httpCode": "400",
+                        "errorCode": "API-COMMSG-001",
+                        "message": "Bad Request",
+                        "detailedMessage": "Bad Request",
+                        "link": {
+                          "href": "https://api.claro.com.br/docs/error_codes.html",
+                          "rel": "related"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageSmsWoaSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "cb559b11-a3cd-4cb9-b12a-31aa91f53f1f",
+                      "error": {
+                        "httpCode": "400",
+                        "errorCode": "API-COMMSG-001",
+                        "message": "Bad Request",
+                        "detailedMessage": "Bad Request",
+                        "link": {
+                          "href": "https://api.claro.com.br/docs/error_codes.html",
+                          "rel": "related"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/javascript": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                },
+                "examples": {
+                  "communicationMessageEmailSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "a5b3eccd-1ed0-4e08-9a80-5c2dbc3c509f",
+                      "error": {
+                        "httpCode": "500",
+                        "errorCode": "API-COMMSG-011",
+                        "message": "Internal Server Error",
+                        "detailedMessage": "Ocorreu uma falha\n                                    técnica inesperada na execução do serviço\n                                -Entre em contato com o\n                                    suporte técnico informando esta mensagem\n                                 - Host: brux0742  IP: 10.18.81.219\nTimestamp: 2020-08-13 16:45:56\nError Code: TE-0001\nError Message: Ocorreu uma falha técnica inesperada na execução do serviço\nError Reason Code:\nError Reason Description:\nError Instruction: Entre em contato com o suporte técnico informando esta mensagem\nError Detail: br.com.claro.soa.svcframework.common.fault.TechnicalFaultException: Ocorreu uma falha técnica inesperada na execução do serviço\n\tat br.com.claro.soa.vas.enviaremail.spa.SPAMessageDeliverImpl.deliverMessage(SPAMessageDeliverImpl.java:70)\n\tat br.com.claro.soa.svcframework.spa.adapter.AbstractXMLBeanAdapter.deliverMessage(AbstractXMLBeanAdapter.java:46)\n\tat br.com.claro.soa.svcframework.spa.adapter.AbstractNodeAdapter.deliverMessage(AbstractNodeAdapter.java:54)\n\tat sun.reflect.GeneratedMethodAccessor335.invoke(Unknown Source)\n\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n\tat java.lang.reflect.Method.invoke(Method.java:606)\n",
+                        "link": {
+                          "rel": "related",
+                          "href": "https://api.claro.com.br/docs/error_codes.html"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessagePushSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "16104e2f-7528-4111-9942-229e50fec6d1",
+                      "error": {
+                        "httpCode": "500",
+                        "errorCode": "API-COMMSG-011",
+                        "message": "Internal Server Error",
+                        "detailedMessage": null,
+                        "link": {
+                          "rel": "related",
+                          "href": "https://api.claro.com.br/docs/error_codes.html"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageQuizSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "16104e2f-7528-4111-9942-229e50fec6d1",
+                      "error": {
+                        "httpCode": "500",
+                        "errorCode": "API-COMMSG-011",
+                        "message": "Internal Server Error",
+                        "detailedMessage": null,
+                        "link": {
+                          "rel": "related",
+                          "href": "https://api.claro.com.br/docs/error_codes.html"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageSalesSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "16104e2f-7528-4111-9942-229e50fec6d1",
+                      "error": {
+                        "httpCode": "500",
+                        "errorCode": "API-COMMSG-011",
+                        "message": "Internal Server Error",
+                        "detailedMessage": null,
+                        "link": {
+                          "rel": "related",
+                          "href": "https://api.claro.com.br/docs/error_codes.html"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageShoppingCartSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "16104e2f-7528-4111-9942-229e50fec6d1",
+                      "error": {
+                        "httpCode": "500",
+                        "errorCode": "API-COMMSG-011",
+                        "message": "Internal Server Error",
+                        "detailedMessage": null,
+                        "link": {
+                          "rel": "related",
+                          "href": "https://api.claro.com.br/docs/error_codes.html"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageSmsSoaSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "16104e2f-7528-4111-9942-229e50fec6d1",
+                      "error": {
+                        "httpCode": "500",
+                        "errorCode": "API-COMMSG-011",
+                        "message": "Internal Server Error",
+                        "detailedMessage": null,
+                        "link": {
+                          "rel": "related",
+                          "href": "https://api.claro.com.br/docs/error_codes.html"
+                        }
+                      }
+                    }
+                  },
+                  "communicationMessageSmsWoaSendResponse": {
+                    "value": {
+                      "apiVersion": "1;2020-08-25",
+                      "transactionId": "16104e2f-7528-4111-9942-229e50fec6d1",
+                      "error": {
+                        "httpCode": "500",
+                        "errorCode": "API-COMMSG-011",
+                        "message": "Internal Server Error",
+                        "detailedMessage": null,
+                        "link": {
+                          "rel": "related",
+                          "href": "https://api.claro.com.br/docs/error_codes.html"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              },
+              "application/javascript": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/communicationPostEmailRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostPushRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostSMSRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostSalesRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostQuizRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostSalesShoppingCartRequest"
+                  }
+                ]
+              },
+              "examples": {
+                "communicationPostPush200Request": {
+                  "value": {
+                    "data": {
+                      "content": "Cliente Claro, agora voce acessa sua Fatura pelo app Minha Claro. Ative as notificacoes e seja sempre lembrado.",
+                      "receiver": [
+                        {
+                          "phoneNumber": "91111111111",
+                          "pushParameters": {
+                            "title": "Mensagem Minha Claro",
+                            "clickAction": "OPEN_APP",
+                            "targetApplication": "MINHACLARO"
+                          }
+                        }
+                      ],
+                      "costCenter": "POS PAGO ONLINE",
+                      "type": "PUSH"
+                    }
+                  }
+                },
+                "communicationPostPush400Request": {
+                  "value": {
+                    "data": {
+                      "content": "Cliente Claro, agora voce acessa sua Fatura pelo app Minha Claro. Ative as notificacoes e seja sempre lembrado.",
+                      "receiver": [
+                        {
+                          "phoneNumber": "91111111112",
+                          "pushParameters": {
+                            "title": "Mensagem Minha Claro",
+                            "clickAction": "OPEN_APP",
+                            "targetApplication": "MINHACLARO"
+                          }
+                        }
+                      ],
+                      "costCenter": "POS PAGO ONLINE",
+                      "type": "PUSH"
+                    }
+                  }
+                },
+                "communicationPostPush500Request": {
+                  "value": {
+                    "data": {
+                      "content": "Cliente Claro, agora voce acessa sua Fatura pelo app Minha Claro. Ative as notificacoes e seja sempre lembrado.",
+                      "receiver": [
+                        {
+                          "phoneNumber": "91111111114",
+                          "pushParameters": {
+                            "title": "Mensagem Minha Claro",
+                            "clickAction": "OPEN_APP",
+                            "targetApplication": "MINHACLARO"
+                          }
+                        }
+                      ],
+                      "costCenter": "POS PAGO ONLINE",
+                      "type": "PUSH"
+                    }
+                  }
+                },
+                "communicationPostSMSSoa200Request": {
+                  "value": {
+                    "data": {
+                      "content": "Seu Token para autenticar: 611820",
+                      "type": "SMS",
+                      "receiver": [
+                        {
+                          "phoneNumber": "83911111111"
+                        }
+                      ],
+                      "sender": {
+                        "id": "ID_BROKER_SMS",
+                        "phoneNumber": "5511911111111"
+                      }
+                    }
+                  }
+                },
+                "communicationPostSMSSoaEnvioNaoAutorizado200Request": {
+                  "value": {
+                    "data": {
+                      "content": "Seu Token para autenticar: 611820",
+                      "type": "SMS",
+                      "receiver": [
+                        {
+                          "phoneNumber": "83911111111"
+                        }
+                      ],
+                      "sender": {
+                        "id": "ID_BROKER_SMS",
+                        "phoneNumber": "5511911111112"
+                      }
+                    }
+                  }
+                },
+                "communicationPostSMSSoa400Request": {
+                  "value": {
+                    "data": {
+                      "content": "Seu Token para autenticar: 611820",
+                      "type": "SMS",
+                      "receiver": [
+                        {
+                          "phoneNumber": "83911111111"
+                        }
+                      ],
+                      "sender": {
+                        "id": "ID_BROKER_SMS",
+                        "phoneNumber": "5511911111113"
+                      }
+                    }
+                  }
+                },
+                "communicationPostSMSSoa500Request": {
+                  "value": {
+                    "data": {
+                      "content": "Seu Token para autenticar: 611820",
+                      "type": "SMS",
+                      "receiver": [
+                        {
+                          "phoneNumber": "83911111111"
+                        }
+                      ],
+                      "sender": {
+                        "id": "ID_BROKER_SMS",
+                        "phoneNumber": "5511911111114"
+                      }
+                    }
+                  }
+                },
+                "communicationPostSMSWoa200Request": {
+                  "value": {
+                    "data": {
+                      "content": "Seu Token para autenticar: 611820",
+                      "type": "SMS",
+                      "receiver": [
+                        {
+                          "phoneNumber": "83911111112"
+                        }
+                      ],
+                      "sender": {
+                        "id": "ID_BROKER_SMS",
+                        "phoneNumber": "5511911111111"
+                      }
+                    }
+                  }
+                },
+                "communicationPostSMSWoa400Request": {
+                  "value": {
+                    "data": {
+                      "content": "Seu Token para autenticar: 611820",
+                      "type": "SMS",
+                      "receiver": [
+                        {
+                          "phoneNumber": "83911111112"
+                        }
+                      ],
+                      "sender": {
+                        "id": "ID_BROKER_SMS",
+                        "phoneNumber": "5511911111113"
+                      }
+                    }
+                  }
+                },
+                "communicationPostSMSWoa500Request": {
+                  "value": {
+                    "data": {
+                      "content": "Seu Token para autenticar: 611820",
+                      "type": "SMS",
+                      "receiver": [
+                        {
+                          "phoneNumber": "83911111112"
+                        }
+                      ],
+                      "sender": {
+                        "id": "ID_BROKER_SMS",
+                        "phoneNumber": "5511911111114"
+                      }
+                    }
+                  }
+                },
+                "communicationPostEmail200TextoRequest": {
+                  "value": {
+                    "data": {
+                      "description": "TEXTO",
+                      "type": "EMAIL",
+                      "sender": {
+                        "email": "200@claro.com.br"
+                      },
+                      "receiver": [
+                        {
+                          "email": "email@claro.com.br"
+                        }
+                      ],
+                      "subject": "Claro - Token para autenticar 081111",
+                      "content": "Seu Token para autenticar: 081111"
+                    }
+                  }
+                },
+                "communicationPostEmail200HtmlRequest": {
+                  "value": {
+                    "data": {
+                      "description": "TEXTO",
+                      "type": "EMAIL",
+                      "sender": {
+                        "email": "200@claro.com.br"
+                      },
+                      "receiver": [
+                        {
+                          "email": "email@claro.com.br"
+                        }
+                      ],
+                      "subject": "Claro - Token para autenticar 081111",
+                      "content": "<center><br/><table>Teste</table></center>"
+                    }
+                  }
+                },
+                "communicationPostEmail400MensagemEmailExpiradaRequest": {
+                  "value": {
+                    "data": {
+                      "description": "TEXTO",
+                      "type": "EMAIL",
+                      "sender": {
+                        "email": "400-1@claro.com.br"
+                      },
+                      "receiver": [
+                        {
+                          "email": "email@claro.com.br"
+                        }
+                      ],
+                      "subject": "Claro - Token para autenticar 081111",
+                      "content": "Seu Token para autenticar: 081111"
+                    }
+                  }
+                },
+                "communicationPostEmail400ParametroInvalidoRequest": {
+                  "value": {
+                    "data": {
+                      "description": "TEXTO",
+                      "type": "EMAIL",
+                      "sender": {
+                        "email": "400-2@claro.com.br"
+                      },
+                      "receiver": [
+                        {
+                          "email": "email@claro.com.br"
+                        }
+                      ],
+                      "subject": "Claro - Token para autenticar 081111",
+                      "content": "Seu Token para autenticar: 081111"
+                    }
+                  }
+                },
+                "communicationPostEmail500TechinicalFaultRequest": {
+                  "value": {
+                    "data": {
+                      "description": "TEXTO",
+                      "type": "EMAIL",
+                      "sender": {
+                        "email": "500@claro.com.br"
+                      },
+                      "receiver": [
+                        {
+                          "email": "email@claro.com.br"
+                        }
+                      ],
+                      "subject": "Claro - Token para autenticar 081111",
+                      "content": "Seu Token para autenticar: 081111"
+                    }
+                  }
+                },
+                "communicationPostSales200Request": {
+                  "value": {
+                    "data": {
+                      "type": "SALES",
+                      "telephoneNumber": "5511911111111",
+                      "emailAddress": "email123@gmail.com",
+                      "partyIdentificationNumber": "39111111111",
+                      "serviceChannel": "EMAIL",
+                      "layoutId": "ecommerce_reprovado_fraude",
+                      "customerName": "Franciele De Jesus Santos",
+                      "customerOrderId": "000009919852",
+                      "customerOrderStatus": "Pedido Cancelado",
+                      "plan": {
+                        "amount": 10.2,
+                        "dueDate": "2020-09-08T22:45:00.912"
+                      },
+                      "payment": {
+                        "method": "BOLETO",
+                        "billet": {
+                          "dueDate": "2020-09-08T22:45:00.912",
+                          "amount": 10.6,
+                          "barcode": "846400000010829800820898000000000003110773000001"
+                        }
+                      },
+                      "device": {
+                        "model": "Samsung",
+                        "value": 1000
+                      },
+                      "urbanPropertyAddress": {
+                        "streetNameComplete": "R CARDOSO34 Apt 13",
+                        "postcode": "05766290",
+                        "neighborhood": "JARDIM OLINDA",
+                        "cityName": "São Paulo",
+                        "stateAbbreviation": "SP"
+                      },
+                      "productName": "8GB",
+                      "token": "6197",
+                      "prezaoPromotion": "Nome_da_promoção",
+                      "dependentList": [
+                        [
+                          "5511982331111",
+                          "iPhone",
+                          40.00,
+                          "5511982331111"
+                        ],
+                        [
+                          "5511982332222",
+                          "myPhone",
+                          40.00,
+                          "5511982332222"
+                        ]
+                      ]
+                    }
+                  }
+                },
+                "communicationPostSales400Request": {
+                  "value": {
+                    "data": {
+                      "type": "SALES",
+                      "telephoneNumber": "5511911111112",
+                      "emailAddress": "email123@gmail.com",
+                      "partyIdentificationNumber": "39111111111",
+                      "serviceChannel": "EMAIL",
+                      "layoutId": "ecommerce_reprovado_fraude",
+                      "customerName": "Franciele De Jesus Santos",
+                      "customerOrderId": "000009919852",
+                      "customerOrderStatus": "Pedido Cancelado",
+                      "plan": {
+                        "amount": 10.2,
+                        "dueDate": "2020-09-08T22:45:00.912"
+                      },
+                      "payment": {
+                        "method": "BOLETO",
+                        "billet": {
+                          "dueDate": "2020-09-08T22:45:00.912",
+                          "amount": 10.6,
+                          "barcode": "846400000010829800820898000000000003110773000001"
+                        }
+                      },
+                      "device": {
+                        "model": "Samsung",
+                        "value": 1000
+                      },
+                      "urbanPropertyAddress": {
+                        "streetNameComplete": "R CARDOSO34 Apt 13",
+                        "postcode": "05766290",
+                        "neighborhood": "JARDIM OLINDA",
+                        "cityName": "São Paulo",
+                        "stateAbbreviation": "SP"
+                      },
+                      "productName": "8GB",
+                      "token": "6197",
+                      "prezaoPromotion": "Nome_da_promoção",
+                      "dependentList": [
+                        [
+                          "5511982331111",
+                          "iPhone",
+                          40.00,
+                          "5511982331111"
+                        ],
+                        [
+                          "5511982332222",
+                          "myPhone",
+                          40.00,
+                          "5511982332222"
+                        ]
+                      ]
+                    }
+                  }
+                },
+                "communicationPostSales500Request": {
+                  "value": {
+                    "data": {
+                      "type": "SALES",
+                      "telephoneNumber": "5511911111113",
+                      "emailAddress": "email123@gmail.com",
+                      "partyIdentificationNumber": "39111111111",
+                      "serviceChannel": "EMAIL",
+                      "layoutId": "ecommerce_reprovado_fraude",
+                      "customerName": "Franciele De Jesus Santos",
+                      "customerOrderId": "000009919852",
+                      "customerOrderStatus": "Pedido Cancelado",
+                      "plan": {
+                        "amount": 10.2,
+                        "dueDate": "2020-09-08T22:45:00.912"
+                      },
+                      "payment": {
+                        "method": "BOLETO",
+                        "billet": {
+                          "dueDate": "2020-09-08T22:45:00.912",
+                          "amount": 10.6,
+                          "barcode": "846400000010829800820898000000000003110773000001"
+                        }
+                      },
+                      "device": {
+                        "model": "Samsung",
+                        "value": 1000
+                      },
+                      "urbanPropertyAddress": {
+                        "streetNameComplete": "R CARDOSO34 Apt 13",
+                        "postcode": "05766290",
+                        "neighborhood": "JARDIM OLINDA",
+                        "cityName": "São Paulo",
+                        "stateAbbreviation": "SP"
+                      },
+                      "productName": "8GB",
+                      "token": "6197",
+                      "prezaoPromotion": "Nome_da_promoção",
+                      "dependentList": [
+                        [
+                          "5511982331111",
+                          "iPhone",
+                          40.00,
+                          "5511982331111"
+                        ],
+                        [
+                          "5511982332222",
+                          "myPhone",
+                          40.00,
+                          "5511982332222"
+                        ]
+                      ]
+                    }
+                  }
+                },
+                "communicationPostQuiz200Request": {
+                  "value": {
+                    "data": {
+                      "content": "Mensagem",
+                      "type": "SMS",
+                      "subType": "QUIZ",
+                      "channel": "URA552",
+                      "receiver": {
+                        "phoneNumber": "5511911111111"
+                      },
+                      "sender": {
+                        "phoneNumber": "2278"
+                      }
+                    }
+                  }
+                },
+                "communicationPostQuiz400Request": {
+                  "value": {
+                    "data": {
+                      "content": "Mensagem",
+                      "type": "SMS",
+                      "subType": "QUIZ",
+                      "channel": "URA552",
+                      "receiver": {
+                        "phoneNumber": "5511911111112"
+                      },
+                      "sender": {
+                        "phoneNumber": "2278"
+                      }
+                    }
+                  }
+                },
+                "communicationPostQuiz500Request": {
+                  "value": {
+                    "data": {
+                      "content": "Mensagem",
+                      "type": "SMS",
+                      "subType": "QUIZ",
+                      "channel": "URA552",
+                      "receiver": {
+                        "phoneNumber": "5511911111113"
+                      },
+                      "sender": {
+                        "phoneNumber": "2278"
+                      }
+                    }
+                  }
+                },
+                "communicationPostSalesShoppingCart200Request": {
+                  "value": {
+                    "data": {
+                      "type": "SALES",
+                      "subType": "SHOPPING_CART",
+                      "telephoneNumber": "5511911111111",
+                      "emailAddress": "teste@gmail.com",
+                      "partyIdentificationNumber": "455181123",
+                      "customerName": "ANdre Teixeira",
+                      "productCategory": "POS",
+                      "productName": "",
+                      "shoppingCart": {
+                        "id": "1234",
+                        "action": "ADICIONAR",
+                        "date": "2020-02-20T10:30:10.912"
+                      },
+                      "url": "http://www.claro.com.br/",
+                      "modality": "MIGRACAO"
+                    }
+                  }
+                },
+                "communicationPostSalesShoppingCart400Request": {
+                  "value": {
+                    "data": {
+                      "type": "SALES",
+                      "subType": "SHOPPING_CART",
+                      "telephoneNumber": "5511911111112",
+                      "emailAddress": "teste@gmail.com",
+                      "partyIdentificationNumber": "455181123",
+                      "customerName": "ANdre Teixeira",
+                      "productCategory": "POS",
+                      "productName": "",
+                      "shoppingCart": {
+                        "id": "1234",
+                        "action": "ADICIONAR",
+                        "date": "2020-02-20T10:30:10.912"
+                      },
+                      "url": "http://www.claro.com.br/",
+                      "modality": "MIGRACAO"
+                    }
+                  }
+                },
+                "communicationPostSalesShoppingCart500Request": {
+                  "value": {
+                    "data": {
+                      "type": "SALES",
+                      "subType": "SHOPPING_CART",
+                      "telephoneNumber": "5511911111113",
+                      "emailAddress": "teste@gmail.com",
+                      "partyIdentificationNumber": "455181123",
+                      "customerName": "ANdre Teixeira",
+                      "productCategory": "POS",
+                      "productName": "",
+                      "shoppingCart": {
+                        "id": "1234",
+                        "action": "ADICIONAR",
+                        "date": "2020-02-20T10:30:10.912"
+                      },
+                      "url": "http://www.claro.com.br/",
+                      "modality": "MIGRACAO"
+                    }
+                  }
+                }
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/communicationPostPushRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostSMSRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostEmailRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostSalesRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostQuizRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/communicationPostSalesShoppingCartRequest"
+                  }
+                ]
+              }
+            }
+          },
+          "description": "Corpo do request que contém dados do usuário a ser cadastrado. \nPara degustação desta API (ambiente: sandbox), utilize os seguintes exemplos:\n\n 200 - retorno de código de status http 200.\n   \n 400 - retorno de código de status http 400.\n\n 500 - retorno de código de status http 500.",
+          "required": true
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url":"https://api-sandbox.claro.com.br/domains/v1",
+      "description":"Sandbox (SaaS)"
+    },
+    {
+      "url": "https://sandbox.cas.apigw.claro.com.br/domains/v1",
+      "description": "Sandbox (OPDK Campinas)"
+    },
+    {
+      "url": "https://sandbox.lpa.apigw.claro.com.br/domains/v1",
+      "description": "Sandbox (OPDK Lapa)"
+    },
+    {
+      "url":"https://api-lab.claro.com.br/domains/v1",
+      "description":"Lab (SaaS)"
+    },
+    {
+      "url":"https://lab.apigw.claro.com.br/domains/v1",
+      "description":"Lab (OPDK)"
+    },
+     {
+      "url":"https://api-dev.claro.com.br/domains/v1",
+      "description":"Dev (SaaS)"
+    },
+     {
+      "url":"https://dev.apigw.claro.com.br/domains/v1",
+      "description":"Dev (OPDK)"
+    },
+    {
+      "url":"https://api-test.claro.com.br/domains/v1",
+      "description":"Test (SaaS)"
+    },
+    {
+      "url":"https://test.apigw.claro.com.br/domains/v1",
+      "description":"Test (OPDK)"
+    },
+    {
+      "url":"https://api.claro.com.br/domains/v1",
+      "description":"Produção (SaaS)"
+    },
+    {
+      "url": "https://cas.apigw.claro.com.br/domains/v1",
+      "description": "Produção (OPDK Campinas)"
+    },
+    {
+      "url": "https://lpa.apigw.claro.com.br/domains/v1",
+      "description": "Produção (OPDK Lapa)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "x-client-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-client-key"
+      },
+      "x-client-auth": {
+        "type": "http",
+        "scheme": "header"
+      },
+      "BearerAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "schemas": {
+      "communicationPostPushRequest": {
+        "description": "Representa o request para envio de notificação Push.",
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/communicationMessageObj"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "costCenter",
+                  "content",
+                  "type",
+                  "receiver"
+                ],
+                "properties": {
+                  "receiver": {
+                    "type": "array",
+                    "items": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Receiver"
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "phoneNumber",
+                            "pushParameters"
+                          ],
+                          "properties": {
+                            "pushParameters": {
+                              "allOf": [
+                                {
+                                  "$ref": "#/components/schemas/PushParams"
+                                },
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "targetApplication",
+                                    "title",
+                                    "clickAction"
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "communicationPostSMSRequest": {
+        "description": "Representa o request para envio de notificação SMS.",
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/communicationMessageObj"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "content",
+                  "type",
+                  "receiver",
+                  "sender"
+                ],
+                "properties": {
+                  "receiver": {
+                    "type": "array",
+                    "items": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Receiver"
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "phoneNumber"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "sender": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Sender"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "phoneNumber"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "communicationPostEmailRequest": {
+        "description": "Representa o request para envio de Email.",
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/communicationMessageObj"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "content",
+                  "description",
+                  "subject",
+                  "type",
+                  "receiver",
+                  "sender"
+                ],
+                "properties": {
+                  "receiver": {
+                    "type": "array",
+                    "items": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Receiver"
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "email"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "sender": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Sender"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "email"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "communicationPostSalesRequest": {
+        "description": "Objeto de negócio contendo os dados submetidos à API.",
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/communicationMessageSalesObj"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "telephoneNumber",
+                  "emailAddress",
+                  "partyIdentificationNumber",
+                  "serviceChannel",
+                  "layoutId"
+                ],
+                "properties": {
+                  "serviceChannel": {
+                    "type": "string",
+                    "description": "Canal Utilizado para comunicação.",
+                    "enum": [
+                      "SMS",
+                      "EMAIL"
+                    ],
+                    "example": "SMS"
+                  },
+                  "layoutId": {
+                    "type": "string",
+                    "description": "ID Da comunicação. Quando serviceChannel = SMS pode ser utilizado um dos seguintes valores (ID1,ID2,ID3,ID4,ID5), quando serviceChannel = EMAIL pode ser utilizado um dos seguintes valores (69240,69259,69260,69261,69262).",
+                    "enum": [
+                      "69240",
+                      "69259",
+                      "69260",
+                      "69261",
+                      "69262",
+                      "ID1",
+                      "ID2",
+                      "ID3",
+                      "ID4",
+                      "ID5"
+                    ],
+                    "example": "ID1"
+                  },
+                  "customerOrderId": {
+                    "type": "string",
+                    "description": "Número do Pedido.",
+                    "example": "123456789"
+                  },
+                  "customerOrderStatus": {
+                    "type": "string",
+                    "description": "Status do pedido da Plataforma.",
+                    "example": "Pedido Criado"
+                  },
+                  "plan": {
+                    "$ref": "#/components/schemas/Plan"
+                  },
+                  "payment": {
+                    "$ref": "#/components/schemas/Payment"
+                  },
+                  "device": {
+                    "$ref": "#/components/schemas/Device"
+                  },
+                  "urbanPropertyAddress": {
+                    "$ref": "#/components/schemas/UrbanPropertyAddress"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Número do Token.",
+                    "example": "1986"
+                  },
+                  "prezaoPromotion": {
+                    "type": "string",
+                    "description": "Nome da promoção Prézão.",
+                    "example": "Nome_da_promoção"
+                  },
+                  "dependentList": {
+                    "type": "array",
+                    "description": "Lista de dependentes",
+                    "items": {
+                      "type": "array",
+                      "description": "Lista de propriedades dos dependentes",
+                      "items": {}
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "communicationPostSalesShoppingCartRequest": {
+        "description": "Objeto de negócio contendo os dados submetidos à API.",
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/communicationMessageSalesObj"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type",
+                  "subType",
+                  "customerName",
+                  "telephoneNumber",
+                  "emailAddress",
+                  "partyIdentificationNumber",
+                  "shoppingCart",
+                  "productCategory",
+                  "url",
+                  "modality"
+                ],
+                "properties": {
+                  "subType": {
+                    "type": "string",
+                    "description": "Carrinho de compras",
+                    "enum": [
+                      "SHOPPING_CART"
+                    ],
+                    "example": "SHOPPING_CART"
+                  },
+                  "productCategory": {
+                    "type": "string",
+                    "description": "Categoria do Plano Contratado.",
+                    "example": "POS, CONTROLE"
+                  },
+                  "shoppingCart": {
+                    "$ref": "#/components/schemas/ShoppingCart"
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "URL do carrinho.",
+                    "example": "http://www.claro.com.br/"
+                  },
+                  "modality": {
+                    "type": "string",
+                    "description": "Modalidade .",
+                    "example": "MIGRACAO"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "communicationPostQuizRequest": {
+        "description": "Representa o request para envio de notificação SMS - QUIZ.",
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/communicationMessageObj"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "content",
+                  "type",
+                  "subType",
+                  "channel",
+                  "receiver",
+                  "sender"
+                ],
+                "properties": {
+                  "receiver": {
+                    "type": "array",
+                    "items": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Receiver"
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "phoneNumber"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "sender": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Sender"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "phoneNumber"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "communicationMessageSendResponse": {
+        "description": "Objeto de negócio contendo os dados retornados pela API caso existam.",
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "transactionId"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2015-08-12”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "1;2019-04-12"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "Id-12312414231"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Código de identificação de envio da mensagem",
+                    "example": "brux0744.claro.com.br!4a00c534-e525-4fae-80bc-da7570ff774e"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "xml": {
+          "name": "xml"
+        }
+      },
+      "communicationMessageSendSalesResponse": {
+        "description": "Objeto de negócio contendo os dados retornados pela API caso existam.",
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "transactionId"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2015-08-12”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "1;2019-04-12"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "Id-12312414231"
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "statusCode",
+              "telephoneNumber"
+            ],
+            "properties": {
+              "statusCode": {
+                "type": "string",
+                "description": "Código status serviço",
+                "example": "RTMD00 – Execução com Sucesso"
+              },
+              "telephoneNumber": {
+                "type": "string",
+                "description": "Telefone Cliente.",
+                "example": "11991234455"
+              },
+              "customerOrderId": {
+                "type": "string",
+                "description": "Número do Pedido.",
+                "example": "123456789"
+              },
+              "token": {
+                "type": "string",
+                "description": "Número do Token.",
+                "example": "1986"
+              },
+              "errorCode": {
+                "type": "string",
+                "description": "Código do Erro.",
+                "example": "03"
+              },
+              "detailedMessage": {
+                "type": "string",
+                "description": "Motivo do Erro",
+                "example": "SMS NAO ENVIADO"
+              }
+            }
+          }
+        },
+        "xml": {
+          "name": "xml"
+        }
+      },
+      "communicationMessageSendQuizResponse": {
+        "description": "Objeto de negócio contendo os dados retornados pela API caso existam.",
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "transactionId"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2015-08-12”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "1;2019-04-12"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "Id-12312414231"
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "statusCode"
+            ],
+            "properties": {
+              "statusCode": {
+                "type": "string",
+                "description": "Código status serviço",
+                "example": "RTMD00"
+              },
+              "statusDescription": {
+                "type": "string",
+                "description": "Descrição do status serviço",
+                "example": "Execução com Sucesso"
+              },
+              "resultCode": {
+                "type": "string",
+                "description": "Código do retorno do serviço SMS",
+                "example": "000"
+              },
+              "resultDescription": {
+                "type": "string",
+                "description": "Descrição de retorno do serviço SMS",
+                "example": "Message Sent"
+              }
+            }
+          }
+        },
+        "xml": {
+          "name": "xml"
+        }
+      },
+      "communicationMessageSendSalesShoppingCartResponse": {
+        "description": "Objeto de negócio contendo os dados retornados pela API caso existam.",
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "transactionId"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2015-08-12”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "1;2019-04-12"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "Id-12312414231"
+          },
+          "data": {
+            "type": "object",
+            "required": [
+              "statusCode",
+              "telephoneNumber"
+            ],
+            "properties": {
+              "statusCode": {
+                "type": "string",
+                "description": "Código status serviço",
+                "example": "RTMD00 – Execução com Sucesso"
+              },
+              "telephoneNumber": {
+                "type": "string",
+                "description": "Telefone Cliente.",
+                "example": "11991234455"
+              },
+              "errorCode": {
+                "type": "string",
+                "description": "Código do Erro.",
+                "example": "03"
+              },
+              "detailedMessage": {
+                "type": "string",
+                "description": "Motivo do Erro",
+                "example": "SMS NAO ENVIADO"
+              }
+            }
+          }
+        },
+        "xml": {
+          "name": "xml"
+        }
+      },
+      "communicationMessageObj": {
+        "type": "object",
+        "properties": {
+          "callbackFlag": {
+            "type": "boolean",
+            "deprecated": true
+          },
+          "costCenter": {
+            "type": "string",
+            "description": "Centro de custo a ser debitado.",
+            "example": "23765"
+          },
+          "content": {
+            "type": "string",
+            "description": "Conteúdo da mensagem a ser enviada",
+            "example": "Sua fatura já está disponível no aplicativo MinhaClaro."
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição para o objeto inteiro",
+            "enum": [
+              "TEXTO",
+              "HTML"
+            ],
+            "example": "TEXTO"
+          },
+          "logFlag": {
+            "type": "boolean",
+            "deprecated": true
+          },
+          "priority": {
+            "type": "string",
+            "description": "A prioridade da mensagem de comunicação.\nNúmero menor significa maior prioridade.",
+            "deprecated": true
+          },
+          "sendTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de envio da mensagem.",
+            "deprecated": true
+          },
+          "sendTimeComplete": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de conclusão de envio da mensagem.",
+            "deprecated": true
+          },
+          "status": {
+            "type": "string",
+            "description": "Status do envio",
+            "deprecated": true
+          },
+          "subject": {
+            "type": "string",
+            "description": "O assunto da mensagem. Necessário para email.",
+            "example": "Fatura Claro."
+          },
+          "tryTimes": {
+            "type": "integer",
+            "deprecated": true
+          },
+          "type": {
+            "type": "string",
+            "description": "SMS / E-mail / Mobile app push notification",
+            "enum": [
+              "SMS",
+              "EMAIL",
+              "PUSH"
+            ],
+            "example": "SMS"
+          },
+          "version": {
+            "type": "string",
+            "description": "Versão da comunicação da mensagem",
+            "deprecated": true
+          },
+          "attachment": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Attachment"
+            },
+            "deprecated": true
+          },
+          "subType": {
+            "type": "string",
+            "description": "Sub-Tipo da notificação.",
+            "example": "Quiz"
+          },
+          "channel": {
+            "type": "string",
+            "description": "Canal origem da notificacao",
+            "example": "URA552"
+          },
+          "receiver": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Receiver"
+            }
+          },
+          "sender": {
+            "$ref": "#/components/schemas/Sender"
+          },
+          "characteristic": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommunicationRequestCharacteristic"
+            },
+            "deprecated": true
+          },
+          "@type": {
+            "type": "string",
+            "description": "O tipo de classe do recurso real (para extensão de tipo).",
+            "deprecated": true
+          },
+          "@schemaLocation": {
+            "type": "string",
+            "description": "Um link para o esquema que descreve um recurso (para extensão de tipo).",
+            "deprecated": true
+          },
+          "@baseType": {
+            "type": "string",
+            "description": "O tipo base para uso em coleções polimórficas",
+            "deprecated": true
+          }
+        }
+      },
+      "communicationMessageSalesObj": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "SALES",
+            "enum": [
+              "SALES"
+            ],
+            "example": "SALES"
+          },
+          "telephoneNumber": {
+            "type": "string",
+            "description": "Número do telefone do destinatário.",
+            "example": "5511991234455"
+          },
+          "emailAddress": {
+            "type": "string",
+            "description": "Email do destinatário, se o tipo de comunicação for email",
+            "example": "customer@email.com.br"
+          },
+          "partyIdentificationNumber": {
+            "type": "string",
+            "description": "Documento de identificação do cliente.",
+            "example": "12345678911"
+          },
+          "customerName": {
+            "type": "string",
+            "description": "Nome do Cliente.",
+            "example": "João da Silva"
+          },
+          "productName": {
+            "type": "string",
+            "description": "Plano Contratado.",
+            "example": "PACOTE CLARO X"
+          }
+        }
+      },
+      "Attachment": {
+        "type": "object",
+        "description": "Anexos que serão enviados junto da mensagem",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Um texto narrativo descrevendo o conteúdo do anexo"
+          },
+          "href": {
+            "type": "string",
+            "description": "Link do anexo"
+          },
+          "id": {
+            "type": "string",
+            "description": "Identificador único do anexo"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "O tipo MIME do documento, conforme definido nas especificações RFC 2045 e RFC 2046."
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do arquivo"
+          },
+          "path": {
+            "type": "string",
+            "description": "O caminho do arquivo anexo"
+          },
+          "size": {
+            "type": "integer",
+            "description": "O tamanho do arquivo (sizeUnit se presente indica a unidade, caso contrário, kilobytes é o padrão)."
+          },
+          "sizeUnit": {
+            "type": "integer",
+            "description": "O tamanho da unidade para expressar o tamanho do arquivo (MB, kB ...)"
+          },
+          "url": {
+            "type": "string",
+            "description": "Uniform Resource Locator, é um endereço de página da web (um subconjunto de URI)"
+          },
+          "validFor": {
+            "$ref": "#/components/schemas/TimePeriod"
+          },
+          "@type": {
+            "type": "string",
+            "description": "O tipo de classe do recurso real (para extensão de tipo)."
+          },
+          "@schemaLocation": {
+            "type": "string",
+            "description": "Um link para o esquema que descreve um recurso (para extensão de tipo)."
+          },
+          "@baseType": {
+            "type": "string",
+            "description": "O tipo base para uso em coleções polimórficas"
+          }
+        }
+      },
+      "Receiver": {
+        "type": "object",
+        "description": "<b><i>Destinatários da mensagem de comunicação.</i></b>",
+        "properties": {
+          "appUserId": {
+            "type": "string",
+            "description": "ID do usuário (mobile app user)",
+            "deprecated": true
+          },
+          "email": {
+            "type": "string",
+            "description": "Email do destinatário, se o tipo de comunicação for email",
+            "example": "customer@email.com.br"
+          },
+          "id": {
+            "type": "string",
+            "description": "ID do destinatário da mensagem",
+            "deprecated": true
+          },
+          "ip": {
+            "type": "string",
+            "description": "Endereço IP do destinatário da mensagem",
+            "deprecated": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do destinatário da mensagem",
+            "deprecated": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Número do telefone do destinatário, se o tipo de comunicação for SMS ou PUSH.",
+            "example": "11991234455"
+          },
+          "pushParameters": {
+            "$ref": "#/components/schemas/PushParams"
+          },
+          "type": {
+            "type": "string",
+            "description": "O tipo de destinatário da mensagem de comunicação (To / Cc / Cco / Error)",
+            "example": ""
+          },
+          "relatedParty": {
+            "$ref": "#/components/schemas/RelatedPartyRef"
+          },
+          "@type": {
+            "type": "string",
+            "description": "O tipo de classe do recurso real (para extensão de tipo).",
+            "deprecated": true
+          },
+          "@schemaLocation": {
+            "type": "string",
+            "description": "Um link para o esquema que descreve um recurso (para extensão de tipo).",
+            "deprecated": true
+          },
+          "@baseType": {
+            "type": "string",
+            "description": "O tipo base para uso em coleções polimórficas",
+            "deprecated": true
+          }
+        }
+      },
+      "Sender": {
+        "type": "object",
+        "description": "<b><i>Remetente da mensagem de comunicação.</i></b>",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email do remetente, se o tipo de comunicação for email",
+            "example": "nao-responda@claro.com.br"
+          },
+          "id": {
+            "type": "string",
+            "description": "ID do remetente"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do remetente",
+            "deprecated": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Número do telefone/short-code do remetente, se o tipo de comunicação for SMS.",
+            "example": "1129285598"
+          },
+          "relatedParty": {
+            "$ref": "#/components/schemas/RelatedPartyRef"
+          },
+          "@type": {
+            "type": "string",
+            "description": "O tipo de classe do recurso real (para extensão de tipo).",
+            "deprecated": true
+          },
+          "@schemaLocation": {
+            "type": "string",
+            "description": "Um link para o esquema que descreve um recurso (para extensão de tipo).",
+            "deprecated": true
+          },
+          "@baseType": {
+            "type": "string",
+            "description": "O tipo base para uso em coleções polimórficas",
+            "deprecated": true
+          }
+        }
+      },
+      "UrbanPropertyAddress": {
+        "type": "object",
+        "required": [
+                  "stateAbbreviation",
+                  "neighborhood"
+                ],
+        "description": "<b><i>Dados de Endereço.</i></b>",
+        "properties": {
+          "streetNameComplete": {
+            "type": "string",
+            "description": "Endereço do Cliente contendo rua, número, e complemento.",
+            "example": "R. Teste, 1234"
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Cep do cliente.",
+            "example": "12345-99"
+          },
+          "neighborhood": {
+            "type": "string",
+            "description": "Bairro do cliente. Obrigátorio quando layoutId for 'ecommerce_pedido_sucesso', serviceChannel for 'EMAIL' e type for 'SALES'",
+            "example": "Chacará Santo Antonio"
+          },
+          "cityName": {
+            "type": "string",
+            "description": "Nome da Cidade do cliente.",
+            "example": "São Paulo"
+          },
+          "stateAbbreviation": {
+            "type": "string",
+            "description": "Sigla do Estado do cliente. Obrigátorio quando layoutId for 'ecommerce_pedido_sucesso', serviceChannel for 'EMAIL' e type for 'SALES'",
+            "example": "SP"
+          }
+        }
+      },
+      "Plan": {
+        "type": "object",
+        "description": "<b><i>Dados do plano.</i></b>",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Valor do pagamento.",
+            "example": 10.2
+          },
+          "dueDate": {
+            "type": "string",
+            "description": "Data de vencimento.",
+            "example": "2020-09-11T22:45:00.912"
+          }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "description": "<b><i>Dados de Pagamento.</i></b>",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "Método de pagamento.",
+            "example": "BOLETO"
+          },
+          "barcode": {
+            "type": "string",
+            "description": "Linha digitavel.",
+            "example": "846400000010829800820898000000000003110773000001"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "description": "",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "Modelo do aparelho.",
+            "example": "Samsung"
+          },
+          "value": {
+            "type": "string",
+            "description": "Valor do aparelho.",
+            "example": 1000
+          }
+        }
+      },
+      "ShoppingCart": {
+        "type": "object",
+        "description": "<b><i>Carrinho de compras.</i></b>",
+        "required": [
+          "id",
+          "action",
+          "date"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador do carrinho de compras.",
+            "example": "1234"
+          },
+          "action": {
+            "type": "string",
+            "description": "Status da ação do carrinho de compras.",
+            "example": "Ativo"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora do carrinho"
+          }
+        }
+      },
+      "CommunicationRequestCharacteristic": {
+        "type": "object",
+        "description": "<b><i>Os valores dos parâmetros que são usados no conteúdo, se o conteúdo os contiver.</i></b>",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Identificador de parâmetro de conteúdo",
+            "example": "Contrato"
+          },
+          "value": {
+            "type": "string",
+            "description": "Valor do parâmetro de conteúdo",
+            "example": "12345678"
+          }
+        }
+      },
+      "PushParams": {
+        "type": "object",
+        "description": "<b><i>Os valores dos parâmetros que são usados no envio de notificação Push.</i></b>",
+        "properties": {
+          "contract": {
+            "type": "string",
+            "description": "Número do contrato do cliente Net.",
+            "example": "12345678"
+          },
+          "targetApplication": {
+            "type": "string",
+            "description": "Aplicação alvo, que exibirá a mensagem Push.",
+            "example": "MINHACLARO ou MINHANET ou NOW"
+          },
+          "title": {
+            "type": "string",
+            "description": "Título que será enviado na notificação Push.",
+            "example": "Mensagem Minha Claro"
+          },
+          "clickAction": {
+            "type": "string",
+            "description": "Ação a ser realizada quando o cliente clicar na notificação Push (1: App\n2: Site\n3: Deep link)",
+            "example": "1"
+          },
+          "linkUrl": {
+            "type": "string",
+            "description": "Página html ou do webapp que será aberta caso click action seja igual a 2 ou 3.",
+            "example": "www.claro.com.br"
+          }
+        }
+      },
+      "TimePeriod": {
+        "type": "object",
+        "description": "Usada para representar um período de tempo.",
+        "properties": {
+          "endDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora fim"
+          },
+          "startDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora início"
+          }
+        }
+      },
+      "RelatedPartyRef": {
+        "type": "object",
+        "deprecated": true,
+        "description": "Define a função da parte ou parte vinculada a uma entidade específica.",
+        "properties": {
+          "href": {
+            "type": "string",
+            "description": "Link de referência da related party"
+          },
+          "id": {
+            "type": "string",
+            "description": "Identificador único da related party"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da related party"
+          },
+          "role": {
+            "type": "string",
+            "description": "Função da related party."
+          },
+          "@referredType": {
+            "type": "string",
+            "description": "O tipo real da instância de destino quando necessário para desambiguação."
+          }
+        }
+      },
+      "error": {
+        "description": "Objeto retornado na ocorrência de algum erro (4xx/5xx)",
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "transactionId",
+          "error"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2015-08-12”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível."
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API."
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "httpCode": {
+                "type": "string",
+                "description": "Código de erro HTTP"
+              },
+              "errorCode": {
+                "type": "string",
+                "description": "Código de erro interno da API no formato. Ex.: API-3566. Esse código poderá ser utilizado internamente pelo cliente para mapeamento customizado da mensagem de erro."
+              },
+              "message": {
+                "type": "string",
+                "description": "Mensagem de erro resumida"
+              },
+              "detailedMessage": {
+                "type": "string",
+                "description": "Mensagem de erro detalhada"
+              },
+              "link": {
+                "type": "object",
+                "description": "Objeto para conter o link para a página com a documentação detalhada dos códigos e descrições dos erros no API Portal\n",
+                "properties": {
+                  "rel": {
+                    "type": "string",
+                    "enum": [
+                      "related"
+                    ],
+                    "description": "Para referenciar a página de erros do API portal será utilizada a semântica “related” nesse cenário"
+                  },
+                  "href": {
+                    "type": "string",
+                    "description": "URL completa do recurso"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

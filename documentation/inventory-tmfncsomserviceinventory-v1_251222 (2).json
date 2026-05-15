@@ -1,0 +1,2467 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Service Inventory TMFNC SOM Service Inventory - (Proxy Apigee: inventory-tmfncsomserviceinventory-v1)",
+    "description": "<table>\n  <thead>\n    <tr>\n      <th>Version</th>\n      <th>Author</th>\n      <th>Date</th>\n      <th>Changes</th>\n    </tr>\n  </thead>  \n  <tbody>\n    <tr>\n      <td>1.0.0</td>\n      <td>Roberto Yukio Mata</td>\n      <td>2025-10-17</td>\n      <td>[Fulfillment] - Versão inicial.</td>\n    </tr>\n  </tbody>\n</table>\n\n## Objetivo\nExposição da TMF638 - Service Inventory Management, para a solução Netcracker Fulfilment/OSS, que visa integrar o GPL (Sistema de Inventário Físico e Lógico) e o SOM (Service Order Management), para gerenciamento de serviços provisionados no cliente.\n## Público-alvo\nConsumidor será o \"GPL\" da CPQD\n## Provedores\nO backend provedor da API será o \"SOM\" da NC.\n## Contexto em que a API se Insere\n \nAs funções principais desta interface entre o \"SOM\" e solicitadas pela  API638 pelo GPL serão:\n \nConsultar Serviços</br> Criar Serviço</br> Atualizar de Serviço </br> Apagar Serviço",
+    "version": "1;2025-10-17",
+    "contact": {
+      "name": "(CC-Integração)",
+      "email": "coee.api.integracao@claro.com.br"
+    },
+    "x-claro-domains": [
+      "Service Inventory"
+    ]
+  },
+  "security": [
+    {
+      "BasicAuth": []
+    },
+    {
+      "BearerAuth": []
+    },
+    {
+      "ApiKeyAuth": []
+    },
+    {
+      "OAuth2": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api-sandbox.claro.com.br/inventory/v1",
+      "description": "Sandbox (SaaS)"
+    },
+    {
+      "url": "https://test.apigw.claro.com.br/inventory/v1",
+      "description": "Test (on-premises)"
+    },
+    {
+      "url": "https://api-test.claro.com.br/inventory/v1",
+      "description": "Test (SaaS)"
+    },
+    {
+      "url": "https://api.claro.com.br/inventory/v1",
+      "description": "Production (SaaS)"
+    },
+    {
+      "url": "https://cas.apigw.claro.com.br/inventory/v1",
+      "description": "Production (on-premises DC Campinas)"
+    },
+    {
+      "url": "https://lpa.apigw.claro.com.br/inventory/v1",
+      "description": "Production (on-premises DC Lapa)"
+    }
+  ],
+  "paths": {
+    "/tmf/nc/som/serviceinventory/service": {
+      "get": {
+        "tags": [
+          "Service Inventory"
+        ],
+        "summary": "Consultar Serviços.",
+        "operationId": "getServices",
+        "description": "<li>Os operadores listados abaixo podem ser usados como parâmetros de consulta (query parameters) seguindo a sintaxe: <b>&lt;dotted path to the key in json&gt;[.operator]=&lt;value&gt;</b></li> <table> <thead>\n  <tr>\n    <th>Type</th><th>Operator</th><th>Description</th><th>Example</th>\n  </tr>\n</thead> <tbody>\n  <tr>\n    <td>Query</td>\n    <td>exact</td>\n    <td>Check key for equality. Default operator used when no operator is passed.</td>\n    <td>state.exact=Active</td>\n  </tr>\n  <tr>\n    <td>Query</td>\n    <td>exists</td>\n    <td>Check for field existence. Accepts true or false as value.</td>\n    <td>serviceRelationship.service.exists=true<br>serviceRelationship.service.exists=false</td>\n  </tr>\n  <tr>\n    <td>Query</td>\n    <td>gt</td>\n    <td>Filter objects greater than provided.</td>\n    <td>id.gt=5ea2b4309b285d0001f0a74c</td>\n  </tr>\n  <tr>\n    <td>Query</td>\n    <td>gte</td>\n    <td>Filter objects greater or equals to provided.</td>\n    <td>id.gte=5ea2b4309b285d0001f0a74c</td>\n  </tr>\n  <tr>\n    <td>Query</td>\n    <td>lt</td>\n    <td>Filter objects less than provided.</td>\n    <td>id.lt=5ea2b4309b285d0</td>\n  </tr>\n  <tr>\n    <td>Query</td>\n    <td>lte</td>\n    <td>Filter objects less or equal to provided.</td>\n    <td>id.lte=5ea2b4309b285d0001f0a74c</td>\n  </tr>\n  <tr>\n    <td>Query</td>\n    <td>regex</td>\n    <td>Filter objects that match the value by regular expressions.</td>\n    <td>name.regex=^My_org_[0-9]*</td>\n  </tr>\n  <tr>\n    <td>Query</td>\n    <td>ne</td>\n    <td>Filter objects that do not meet certain conditions.</td>\n    <td>state.ne=Active<br>state.ne=Active,Terminated<br>key.ne=42,43,44</td>\n  </tr>\n</tbody> </table>",
+        "parameters": [
+          {
+            "name": "Range",
+            "in": "header",
+            "description": "Número de serviços a serem retornados, o valor máximo é limitado a 15.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "items=0-15"
+            },
+            "example": "items=0-10"
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "description": "Escopo da busca. 'Actual' [padrão] para buscar dentro das representações mais recentes e reais dos serviços, 'Future' para buscar entre as representações mais recentes, mas possivelmente ainda não aplicadas dos serviços.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "Actual"
+            },
+            "example": "Future"
+          },
+          {
+            "name": "serviceType",
+            "in": "query",
+            "description": "Tipo de serviços a serem retornados. Deixe em branco para retornar todos os serviços.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "External",
+                "Internal"
+              ]
+            },
+            "example": "External"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Propriedades separadas por vírgula a serem fornecidas na resposta.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "id,name,status"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Controla a ordem dos serviços retornados.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "name,-state"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso filtrando por state = Active e name = l3vpn-simple service-907\n\n/tmf/nc/som/serviceinventory/service?state=Active&name=l3vpn-simple service-907\n",
+            "headers": {
+              "Content-Range": {
+                "description": "A página real retornada pela API, juntamente com o número total de serviços que atendem aos critérios. Ex: itens 0-25/100",
+                "style": "simple",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/serviceResponse"
+                },
+                "example": [
+                  {
+                    "id": "5fd75464f1d58c0ed3e370df",
+                    "name": "l3vpn-simple service-907",
+                    "state": "Active",
+                    "serviceSpecification": {
+                      "id": "l3vpn-simple_2.3.3",
+                      "name": "l3vpn-simple",
+                      "version": "2.3.3"
+                    },
+                    "serviceCharacteristic": [
+                      {
+                        "name": "mkey",
+                        "value": {
+                          "mkey": "l3vpn-simple:161:260"
+                        }
+                      },
+                      {
+                        "name": "complexServiceData",
+                        "value": {
+                          "l3vpn": {
+                            "endpoint": [
+                              {
+                                "network-element": "10.101.119.248",
+                                "interface": [
+                                  {
+                                    "interface-name": "ge-0/0/3",
+                                    "interface-type": "newsubinterface",
+                                    "qos-profile": "Gold_10m",
+                                    "ip-address": "192.162.1.18",
+                                    "new-subinterface": {
+                                      "vlan-id": 1015,
+                                      "subinterface-id": 1015
+                                    },
+                                    "mask": 24
+                                  }
+                                ],
+                                "vpn-target": [
+                                  {
+                                    "route-target-type": "export",
+                                    "route-target": [
+                                      "145:269"
+                                    ]
+                                  },
+                                  {
+                                    "route-target-type": "import",
+                                    "route-target": [
+                                      "145:269"
+                                    ]
+                                  }
+                                ],
+                                "vrf-name": "generated_vrf_156",
+                                "routing-protocol": [
+                                  {
+                                    "routing-protocol-type": "bgp",
+                                    "bgp": {
+                                      "neighbour": [
+                                        {
+                                          "local-as": 65100,
+                                          "local-ip": "192.168.1.1",
+                                          "remote-ip": "192.168.1.2",
+                                          "remote-as": 65100
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "route-distinguisher": "161:260"
+                          }
+                        }
+                      }
+                    ],
+                    "serviceRelationship": [
+                      {
+                        "type": "l3vpn-simple-node",
+                        "relationshipType": "l3vpn-simple-node",
+                        "service": {
+                          "id": "5fd753a8f1d58c0ed3e36fbb"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Service Inventory"
+        ],
+        "summary": "Criar Serviço.",
+        "operationId": "createService",
+        "parameters": [
+          {
+            "name": "serviceType",
+            "in": "header",
+            "description": "Tipo de serviço criado. Por padrão, o valor é definido como 'External'. Para criar um serviço 'Internal', adicione explicitamente este cabeçalho com o valor 'Internal'.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "External"
+            },
+            "example": "External"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service_FVO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Criado. Solicitação aceita e o serviço foi cumprido com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
+    },
+    "/tmf/nc/som/serviceinventory/service/{serviceId}": {
+      "get": {
+        "tags": [
+          "Service Inventory"
+        ],
+        "summary": "Consultar Serviço por id.",
+        "operationId": "getService",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Identificador de uma instância de serviço.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "id1234567890"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Propriedades separadas por vírgula a serem fornecidas na resposta. A representação retornada deve conter um campo chamado \"id\" e esse campo deve ser preenchido com o resourceID.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "name,href"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Service Inventory"
+        ],
+        "summary": "Apagar Serviço.",
+        "operationId": "deleteService",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "ID do serviço a ser excluído.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "id1234567890"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "A solicitação DELETE síncrona foi cumprida e resultou na exclusão de um recurso."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Service Inventory"
+        ],
+        "summary": "Atualizar Serviço.",
+        "operationId": "patchService",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "description": "Identificador de uma instância de serviço.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "5fd75462f1d58c0ed3e370d5"
+          },
+          {
+            "name": "Time-Out",
+            "in": "header",
+            "description": "Time Out da solicitação em segundos.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service_MVO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created. Solicitação aceita e o serviço foi cumprido com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "405": {
+            "$ref": "#/components/responses/MethodNotAllowed"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Client-Key"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth2/v1/token",
+            "scopes": {}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "StringCharacteristic": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da característica.",
+            "example": "stringChar"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "string"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "example": "string sample"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "StringArrayCharacteristic": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nome da característica.",
+                "example": "StringArrayChar"
+              },
+              "valueType": {
+                "type": "string",
+                "enum": [
+                  "stringArray"
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "description": "Uma característica cujo valor é um array de String(s).",
+            "properties": {
+              "value": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "value"
+            ]
+          }
+        ]
+      },
+      "ObjectCharacteristic": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da característica.",
+            "example": "objectChar"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "object"
+            ]
+          },
+          "value": {
+            "type": "object",
+            "example": {
+              "object char#1": "value1",
+              "object char#2": "value2"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "ObjectArrayCharacteristic": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nome da característica.",
+                "example": "ObjectArrayChar"
+              },
+              "valueType": {
+                "type": "string",
+                "enum": [
+                  "objectArray"
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "description": "Uma característica cujo valor é um array de Object(s).",
+            "properties": {
+              "value": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "example": {
+                    "object char#1": "value1",
+                    "object char#2": "value2"
+                  }
+                }
+              }
+            },
+            "required": [
+              "value"
+            ]
+          }
+        ]
+      },
+      "NumberCharacteristic": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da característica.",
+            "example": "numberChar"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "number"
+            ]
+          },
+          "value": {
+            "type": "number",
+            "example": 23.5
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "NumberArrayCharacteristic": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nome da característica.",
+                "example": "NumberArrayChar"
+              },
+              "valueType": {
+                "type": "string",
+                "enum": [
+                  "numberArray"
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "description": "Uma característica cujo valor é um array de Number(s).",
+            "properties": {
+              "value": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "example": 23.5
+                }
+              }
+            },
+            "required": [
+              "value"
+            ]
+          }
+        ]
+      },
+      "IntegerCharacteristic": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da característica.",
+            "example": "integerChar"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "integer"
+            ]
+          },
+          "value": {
+            "type": "integer",
+            "example": 24
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "IntegerArrayCharacteristic": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nome da característica.",
+                "example": "IntegerArrayChar"
+              },
+              "valueType": {
+                "type": "string",
+                "enum": [
+                  "integerArray"
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "description": "Uma característica cujo valor é um array de Integer(s).",
+            "properties": {
+              "value": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "example": 24
+                }
+              }
+            },
+            "required": [
+              "value"
+            ]
+          }
+        ]
+      },
+      "BooleanCharacteristic": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da característica.",
+            "example": "booleanChar"
+          },
+          "valueType": {
+            "type": "string",
+            "enum": [
+              "boolean"
+            ]
+          },
+          "value": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "BooleanArrayCharacteristic": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "Nome da característica.",
+                "example": "BooleanArrayChar"
+              },
+              "valueType": {
+                "type": "string",
+                "enum": [
+                  "booleanArray"
+                ]
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          {
+            "type": "object",
+            "description": "Uma característica cujo valor é um array de Boolean(s).",
+            "properties": {
+              "value": {
+                "type": "array",
+                "items": {
+                  "type": "boolean",
+                  "example": true
+                }
+              }
+            },
+            "required": [
+              "value"
+            ]
+          }
+        ]
+      },
+      "Characteristic": {
+        "type": "object",
+        "description": "A característica é um par nome/valor usado para armazenar valores específicos de instância de um atributo.",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StringCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/StringArrayCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/ObjectCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/ObjectArrayCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/NumberCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/NumberArrayCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/IntegerCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/IntegerArrayCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/BooleanCharacteristic"
+          },
+          {
+            "$ref": "#/components/schemas/BooleanArrayCharacteristic"
+          }
+        ]
+      },
+      "PlaceRef": {
+        "type": "object",
+        "description": "Referência ao local. PlaceRef define os placeRefs onde os produtos são vendidos ou entregues.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único."
+          },
+          "href": {
+            "type": "string",
+            "format": "uri",
+            "description": "Referência de hyperlink."
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome da entidade relacionada."
+          },
+          "@baseType": {
+            "example": "ResourceSpecification",
+            "type": "string",
+            "description": "Quando for subclasse, isso define a superclasse."
+          },
+          "@schemaLocation": {
+            "example": "https://mycsp.com:8080/tmf-api/schema/Resource/LogicalResourceSpecification.schema.json",
+            "type": "string",
+            "format": "uri",
+            "description": "Uma URI para um arquivo JSON-Schema que define atributos e relacionamentos adicionais."
+          },
+          "@type": {
+            "type": "string",
+            "description": "Quando for subclasse, isso define o nome da subclasse Extensible.",
+            "enum": [
+              "PlaceRef"
+            ]
+          },
+          "@referredType": {
+            "type": "string",
+            "description": "O tipo real da instância de destino, quando necessário para desambiguação.",
+            "enum": [
+              "GeographicSite",
+              "GeographicLocation",
+              "GeograpgicAddress"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "@referredType"
+        ]
+      },
+      "Place": {
+        "type": "object",
+        "description": "Referência ao local. Place define os locais onde os produtos são vendidos ou entregues.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único do local."
+          },
+          "href": {
+            "type": "string",
+            "description": "Referência única do local."
+          },
+          "name": {
+            "type": "string",
+            "description": "Um nome amigável para o local, como [Loja Paris], [Loja Londres], [Casa Principal]."
+          },
+          "@baseType": {
+            "type": "string",
+            "description": "Quando subclasse, define a superclasse"
+          },
+          "@schemaLocation": {
+            "type": "string",
+            "format": "uri",
+            "description": "Um URI para um arquivo JSON-Schema que define atributos e relacionamentos adicionais"
+          },
+          "@type": {
+            "type": "string",
+            "description": "Quando estiver criando uma subclasse, isso define o nome da entidade da subclasse",
+            "enum": [
+              "GeographicSite",
+              "GeographicLocation",
+              "GeograpgicAddress"
+            ]
+          }
+        }
+      },
+      "RelatedParty": {
+        "required": [
+          "id",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único da parte relacionada. O serviceId não pode conter os seguintes caracteres: / \\ ; % ?",
+            "example": "id1234567890"
+          },
+          "role": {
+            "type": "string",
+            "description": "O papel da parte relacionada.",
+            "example": "Owner"
+          },
+          "href": {
+            "type": "string",
+            "description": "Link para a parte relacionada.",
+            "readOnly": true
+          }
+        },
+        "description": "RelatedParty é a parte envolvida no serviço e o papel que ela desempenha."
+      },
+      "RelatedPlaceRefOrValue": {
+        "allOf": [
+          {
+            "type": "object",
+            "description": "Uma referência a uma entidade, onde o tipo da entidade não é conhecido previamente. Uma entidade relacionada define uma entidade descrita por referência ou por valor vinculada a uma entidade específica. Os atributos polimórficos @type, @schemaLocation & @referredType estão relacionados à Entidade e não à classe RelatedEntityRefOrValue em si.",
+            "properties": {
+              "role": {
+                "type": "string",
+                "example": "InstallationAddress"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Referência de Entidade Relacionada. Um lugar relacionado define um local descrito por referência ou por valor vinculado a uma entidade específica. Os atributos polimórficos @type, @schemaLocation & @referredType estão relacionados à entidade do lugar e não à classe RelatedPlaceRefOrValue em si.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlaceRef"
+              },
+              {
+                "$ref": "#/components/schemas/Place"
+              }
+            ]
+          }
+        ]
+      },
+      "ServiceRelationship": {
+        "required": [
+          "service",
+          "relationshipType"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Tipo de relacionamento, corresponde à especificação do serviço relacionado.",
+            "example": "dependsOn",
+            "deprecated": true
+          },
+          "relationshipType": {
+            "type": "string",
+            "description": "Tipo de relacionamento.",
+            "example": "dependsOn"
+          },
+          "service": {
+            "$ref": "#/components/schemas/ServiceRefOrValue"
+          }
+        },
+        "description": "O relacionamento representa a relação entre serviços."
+      },
+      "ServiceRefOrValue": {
+        "type": "object",
+        "description": "Um serviço a ser criado definido por valor ou existente definido por referência. Os atributos polimórficos @type, @schemaLocation & @referredType estão relacionados à entidade Serviço e não à classe RelatedServiceRefOrValue em si.",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ServiceRef"
+          },
+          {
+            "$ref": "#/components/schemas/ServiceValue"
+          }
+        ]
+      },
+      "Service": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador de uma instância de serviço. Deve ser único para todos os estados de origem, exceto \"Inicial\". Usado em URIs como identificador do serviço. O serviceId não pode conter os seguintes caracteres: / \\ ; % ?",
+            "example": "id1234567890"
+          },
+          "href": {
+            "type": "string",
+            "description": "Referência ao Serviço de propriedade, que faz parte da notação TMF, gerado no lado SO.",
+            "readOnly": true,
+            "example": "http://api-gateway.netcracker.com/eso-manager/api/activation/service/id1234567890"
+          },
+          "category": {
+            "type": "string",
+            "description": "A categoria do serviço.",
+            "example": "CFS",
+            "enum": [
+              "CFS",
+              "RFS"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "O nome do serviço.",
+            "example": "Firewall Service"
+          },
+          "description": {
+            "type": "string",
+            "description": "Uma descrição do serviço que ele fornece.",
+            "example": "Firewall"
+          },
+          "state": {
+            "type": "string",
+            "description": "O estado do ciclo de vida do serviço. Deve ser fornecido, a menos que o serviço tenha uma característica de serviço presente.",
+            "example": "Active",
+            "enum": [
+              " Initial",
+              "Feasibility Checked",
+              "Designed",
+              "Reserved",
+              "Terminated",
+              "Inactive",
+              "Active",
+              "Final"
+            ]
+          },
+          "serviceDate": {
+            "type": "string",
+            "description": "Por padrão, data de criação do primeiro snapshot do serviço.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Ativo.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Terminado.",
+            "format": "date-time",
+            "example": "2019-04-25T08:23:23.443Z"
+          },
+          "serviceSpecification": {
+            "$ref": "#/components/schemas/ServiceSpecificationRef"
+          },
+          "serviceCharacteristic": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Uma lista de pares nome/valor utilizada para armazenar valores específicos da instância de atributos.\nTodos os valores dos atributos específicos da instância são encapsulados como valor do atributo complexServiceData. Consulte o exemplo da estrutura serviceCharacteristic.\nDeve ser fornecido, a menos que o estado esteja presente.",
+            "items": {
+              "$ref": "#/components/schemas/Characteristic"
+            }
+          },
+          "serviceRelationship": {
+            "type": "array",
+            "description": "Lista dos relacionamentos do serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRelationship"
+            }
+          },
+          "relatedParty": {
+            "type": "array",
+            "description": "Lista das partes relacionadas ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedParty"
+            }
+          },
+          "supportingService": {
+            "type": "array",
+            "description": "Lista dos serviços de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRefOrValue"
+            }
+          },
+          "supportingResource": {
+            "type": "array",
+            "description": "Lista dos recursos de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            }
+          },
+          "place": {
+            "type": "array",
+            "description": "Lista dos locais relacionados ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+            }
+          },
+          "isBundle": {
+            "type": "boolean",
+            "description": "Determina se o serviço é um pacote."
+          }
+        },
+        "description": "Service Model é uma estrutura de dados que contém informações sobre a estrutura do serviço."
+      },
+      "Service_FVO": {
+        "required": [
+          "serviceCharacteristic",
+          "serviceSpecification",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador de uma instância de serviço. Deve ser único para todos os estados de origem, exceto \"Inicial\". Usado em URIs como identificador do serviço. O serviceId não pode conter os seguintes caracteres: / \\ ; % ?",
+            "example": "id1234567890"
+          },
+          "href": {
+            "type": "string",
+            "description": "Referência ao Serviço de propriedade, que faz parte da notação TMF, gerado no lado SO.",
+            "readOnly": true,
+            "example": "http://api-gateway.netcracker.com/eso-manager/api/activation/service/id1234567890"
+          },
+          "category": {
+            "type": "string",
+            "description": "A categoria do serviço.",
+            "example": "CFS",
+            "enum": [
+              "CFS",
+              "RFS"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "O nome do serviço.",
+            "example": "Firewall Service"
+          },
+          "description": {
+            "type": "string",
+            "description": "Uma descrição do serviço que ele fornece.",
+            "example": "Firewall"
+          },
+          "state": {
+            "type": "string",
+            "description": "O estado do ciclo de vida do serviço. Deve ser fornecido, a menos que o serviço tenha uma característica de serviço presente.",
+            "example": "Active",
+            "enum": [
+              " Initial",
+              "Feasibility Checked",
+              "Designed",
+              "Reserved",
+              "Terminated",
+              "Inactive",
+              "Active",
+              "Final"
+            ]
+          },
+          "serviceDate": {
+            "type": "string",
+            "description": "Por padrão, data de criação do primeiro snapshot do serviço.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Ativo.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Terminado.",
+            "format": "date-time",
+            "example": "2019-04-25T08:23:23.443Z"
+          },
+          "serviceSpecification": {
+            "$ref": "#/components/schemas/ServiceSpecificationRef"
+          },
+          "serviceCharacteristic": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Uma lista de pares nome/valor utilizada para armazenar valores específicos da instância de atributos.\nTodos os valores dos atributos específicos da instância são encapsulados como valor do atributo complexServiceData. Consulte o exemplo da estrutura serviceCharacteristic.\nDeve ser fornecido, a menos que o estado esteja presente.",
+            "items": {
+              "$ref": "#/components/schemas/Characteristic"
+            }
+          },
+          "serviceRelationship": {
+            "type": "array",
+            "description": "Lista dos relacionamentos do serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRelationship"
+            }
+          },
+          "relatedParty": {
+            "type": "array",
+            "description": "Lista das partes relacionadas ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedParty"
+            }
+          },
+          "supportingService": {
+            "type": "array",
+            "description": "Lista dos serviços de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRefOrValue"
+            }
+          },
+          "supportingResource": {
+            "type": "array",
+            "description": "Lista dos recursos de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            }
+          },
+          "place": {
+            "type": "array",
+            "description": "Lista dos locais relacionados ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+            }
+          },
+          "isBundle": {
+            "type": "boolean",
+            "description": "Determina se o serviço é um pacote."
+          }
+        },
+        "description": "Service Model é uma estrutura de dados que contém informações sobre a estrutura do serviço."
+      },
+      "Service_MVO": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string",
+            "description": "Referência ao Serviço de propriedade, que faz parte da notação TMF, gerado no lado SO.",
+            "readOnly": true,
+            "example": "http://api-gateway.netcracker.com/eso-manager/api/activation/service/id1234567890"
+          },
+          "category": {
+            "type": "string",
+            "description": "A categoria do serviço.",
+            "example": "CFS",
+            "enum": [
+              "CFS",
+              "RFS"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "O nome do serviço.",
+            "example": "Firewall Service"
+          },
+          "description": {
+            "type": "string",
+            "description": "Uma descrição do serviço que ele fornece.",
+            "example": "Firewall"
+          },
+          "state": {
+            "type": "string",
+            "description": "O estado do ciclo de vida do serviço. Deve ser fornecido, a menos que o serviço tenha uma característica de serviço presente.",
+            "example": "Active",
+            "enum": [
+              " Initial",
+              "Feasibility Checked",
+              "Designed",
+              "Reserved",
+              "Terminated",
+              "Inactive",
+              "Active",
+              "Final"
+            ]
+          },
+          "serviceDate": {
+            "type": "string",
+            "description": "Por padrão, data de criação do primeiro snapshot do serviço.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Ativo.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Terminado.",
+            "format": "date-time",
+            "example": "2019-04-25T08:23:23.443Z"
+          },
+          "serviceSpecification": {
+            "$ref": "#/components/schemas/ServiceSpecificationRef"
+          },
+          "serviceCharacteristic": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Uma lista de pares nome/valor utilizada para armazenar valores específicos da instância de atributos.\nTodos os valores dos atributos específicos da instância são encapsulados como valor do atributo complexServiceData. Consulte o exemplo da estrutura serviceCharacteristic.\nDeve ser fornecido, a menos que o estado esteja presente.",
+            "items": {
+              "$ref": "#/components/schemas/Characteristic"
+            }
+          },
+          "serviceRelationship": {
+            "type": "array",
+            "description": "Lista dos relacionamentos do serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRelationship"
+            }
+          },
+          "relatedParty": {
+            "type": "array",
+            "description": "Lista das partes relacionadas ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedParty"
+            }
+          },
+          "supportingService": {
+            "type": "array",
+            "description": "Lista dos serviços de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRefOrValue"
+            }
+          },
+          "supportingResource": {
+            "type": "array",
+            "description": "Lista dos recursos de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            }
+          },
+          "place": {
+            "type": "array",
+            "description": "Lista dos locais relacionados ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+            }
+          },
+          "isBundle": {
+            "type": "boolean",
+            "description": "Determina se o serviço é um pacote."
+          }
+        },
+        "description": "Service Model é uma estrutura de dados que contém informações sobre a estrutura do serviço."
+      },
+      "ServiceValue": {
+        "required": [
+          "id",
+          "serviceCharacteristic",
+          "serviceSpecification",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador de uma instância de serviço. Deve ser único para todos os estados de origem, exceto \"Inicial\". Usado em URIs como identificador do serviço. O serviceId não pode conter os seguintes caracteres: / \\ ; % ?",
+            "example": "id1234567890"
+          },
+          "href": {
+            "type": "string",
+            "description": "Referência ao Serviço de propriedade, que faz parte da notação TMF, gerado no lado SO.",
+            "readOnly": true,
+            "example": "http://api-gateway.netcracker.com/eso-manager/api/activation/service/id1234567890"
+          },
+          "category": {
+            "type": "string",
+            "description": "A categoria do serviço.",
+            "example": "CFS",
+            "enum": [
+              "CFS",
+              "RFS"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "O nome do serviço.",
+            "example": "Firewall Service"
+          },
+          "description": {
+            "type": "string",
+            "description": "Uma descrição do serviço que ele fornece.",
+            "example": "Firewall"
+          },
+          "state": {
+            "type": "string",
+            "description": "O estado do ciclo de vida do serviço. Deve ser fornecido, a menos que o serviço tenha uma característica de serviço presente.",
+            "example": "Active",
+            "enum": [
+              " Initial",
+              "Feasibility Checked",
+              "Designed",
+              "Reserved",
+              "Terminated",
+              "Inactive",
+              "Active",
+              "Final"
+            ]
+          },
+          "serviceDate": {
+            "type": "string",
+            "description": "Por padrão, data de criação do primeiro snapshot do serviço.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Ativo.",
+            "format": "date-time",
+            "example": "2019-04-15T12:26:11.747Z"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Por padrão, data de conclusão da solicitação para o estado Terminado.",
+            "format": "date-time",
+            "example": "2019-04-25T08:23:23.443Z"
+          },
+          "serviceSpecification": {
+            "$ref": "#/components/schemas/ServiceSpecificationRef"
+          },
+          "serviceCharacteristic": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Uma lista de pares nome/valor utilizada para armazenar valores específicos da instância de atributos.\nTodos os valores dos atributos específicos da instância são encapsulados como valor do atributo complexServiceData. Consulte o exemplo da estrutura serviceCharacteristic.\nDeve ser fornecido, a menos que o estado esteja presente.",
+            "items": {
+              "$ref": "#/components/schemas/Characteristic"
+            }
+          },
+          "serviceRelationship": {
+            "type": "array",
+            "description": "Lista dos relacionamentos do serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRelationship"
+            }
+          },
+          "relatedParty": {
+            "type": "array",
+            "description": "Lista das partes relacionadas ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedParty"
+            }
+          },
+          "supportingService": {
+            "type": "array",
+            "description": "Lista dos serviços de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRefOrValue"
+            }
+          },
+          "supportingResource": {
+            "type": "array",
+            "description": "Lista dos recursos de apoio ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            }
+          },
+          "place": {
+            "type": "array",
+            "description": "Lista dos locais relacionados ao serviço.",
+            "items": {
+              "$ref": "#/components/schemas/RelatedPlaceRefOrValue"
+            }
+          },
+          "isBundle": {
+            "type": "boolean",
+            "description": "Determina se o serviço é um pacote."
+          }
+        },
+        "description": "Service Model is é uma estrutura de dados que contém informações sobre a estrutura do serviço."
+      },
+      "ServiceRef": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único do serviço referenciado. O ID não pode conter os seguintes caracteres: / \\ ; % ?",
+            "example": "43"
+          },
+          "href": {
+            "type": "string",
+            "description": "Link para o serviço. Não utilizado",
+            "readOnly": true
+          },
+          "@referredType": {
+            "type": "string",
+            "description": "O tipo real da instância alvo quando necessário para desambiguação."
+          },
+          "@type": {
+            "type": "string",
+            "description": "Quando estiver criando uma subclasse, isso define o nome Extensível da subclasse."
+          }
+        },
+        "description": "ServiceRef representa uma referência a um serviço."
+      },
+      "ServiceSpecificationRef": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "'Identificador de uma especificação de serviço. É obrigatório, caso o nome esteja ausente.\nO ID não pode conter os seguintes caracteres: / \\ ; % ?:'",
+            "example": "l3vpn_1.0.0"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome de uma especificação de serviço.",
+            "example": "l3vpn"
+          },
+          "version": {
+            "type": "string",
+            "description": "Versão opcional de uma especificação de serviço.",
+            "example": "1.0.0"
+          },
+          "href": {
+            "type": "string",
+            "description": "Link para a especificação de serviço relacionada.",
+            "readOnly": true
+          }
+        },
+        "description": "SpecificationRef representa uma referência à especificação do serviço."
+      },
+      "Error": {
+        "type": "object",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/NcTmfErrorResponse1"
+          }
+        ]
+      },
+      "TmfError": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referenceError": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "source": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "NcTmfErrorResponse1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "referenceError": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "source": {
+            "type": "object"
+          },
+          "meta": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TmfError"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "@type": {
+            "type": "string"
+          },
+          "@schemaLocation": {
+            "type": "string"
+          }
+        }
+      },
+      "errorResponse": {
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2021-06-19”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "1;2025-10-17"
+          },
+          "transactionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "b6195102-ea4f-44e8-fed5-386e4ec2a373"
+          },
+          "error": {
+            "type": "object",
+            "description": "Detalhes do erro ocorrido.",
+            "properties": {
+              "httpCode": {
+                "type": "string",
+                "description": "Código HTTP em formato string.",
+                "example": "400"
+              },
+              "errorCode": {
+                "type": "string",
+                "description": "Código interno da API para o erro.",
+                "example": "API-TMFNCSOMSERVICEINVENTORY-400"
+              },
+              "message": {
+                "type": "string",
+                "description": "Mensagem resumida do erro.",
+                "example": "Bad Request."
+              },
+              "detailedMessage": {
+                "type": "string",
+                "description": "Mensagem detalhada do erro.",
+                "example": "Bad Request."
+              },
+              "link": {
+                "type": "object",
+                "description": "Link relacionado ao erro.",
+                "properties": {
+                  "rel": {
+                    "type": "string",
+                    "description": "Relação do link com o recurso.",
+                    "example": "related"
+                  },
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL para documentação ou recurso relacionado.",
+                    "example": "https://api.com.br/docs"
+                  }
+                },
+                "required": [
+                  "rel",
+                  "href"
+                ]
+              }
+            },
+            "required": [
+              "httpCode",
+              "errorCode",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "apiVersion",
+          "transactionId",
+          "error"
+        ]
+      },
+      "serviceResponse": {
+        "description": "Response de Serviço",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Service"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Service"
+            }
+          }
+        ]
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "examples": {
+              "DefaultBadRequest": {
+                "summary": "Bad Request Padrão",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "API-TMFNCSOMSERVICEINVENTORY-400",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Bad Request.",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_3013": {
+                "summary": "Duplicate service id",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_3013",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Duplicate service id",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4001": {
+                "summary": "Could not parse specification from request",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4001",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Could not parse specification from request",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4002": {
+                "summary": "Specification id in invalid format",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4002",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Specification id in invalid format",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4004": {
+                "summary": "Unknown service type constant",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4004",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Unknown service type constant",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4005": {
+                "summary": "Unknown debug constant",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4005",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Unknown debug constant",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4006": {
+                "summary": "Unknown expect header",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4006",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Unknown expect header",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4010": {
+                "summary": "No lifecycle transition",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4010",
+                    "message": "Bad Request.",
+                    "detailedMessage": "No lifecycle transition",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4013": {
+                "summary": "TMF validation failed",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4013",
+                    "message": "Bad Request.",
+                    "detailedMessage": "TMF validation failed",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4018": {
+                "summary": "Service data validation failed",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4018",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Service data validation failed",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4026": {
+                "summary": "Service characteristic patch failed",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4026",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Service characteristic patch failed",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4027": {
+                "summary": "Unexpected service patch error",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4027",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Unexpected service patch error",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4028": {
+                "summary": "Resource task data validation failed",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4028",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Resource task data validation failed",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_4061": {
+                "summary": "Service state missing on by-value services",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "ESO_4061",
+                    "message": "Bad Request.",
+                    "detailedMessage": "Service state missing on by-value services",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "401",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-401",
+                "message": "Unauthorized",
+                "detailedMessage": "Unauthorized User",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "403",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-403",
+                "message": "Forbidden",
+                "detailedMessage": "Access denied.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "404",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-404",
+                "message": "Not found",
+                "detailedMessage": "Resource not found",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "MethodNotAllowed": {
+        "description": "Method Not Allowed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "405",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-405",
+                "message": "Method Not Allowed",
+                "detailedMessage": "Unavailable HTTP method",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotAcceptable": {
+        "description": "Request Not Acceptable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "406",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-406",
+                "message": "Request Not Acceptable",
+                "detailedMessage": "Requested content type not acceptable",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "406",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-406",
+                "message": "Conflict",
+                "detailedMessage": "Conflict",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnsupportedMediaType": {
+        "description": "Unsupported Media Type",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "415",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-415",
+                "message": "Unsupported Media Type",
+                "detailedMessage": "Unsupported request media type",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "Unprocessable Entity.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "examples": {
+              "UnprocessableEntity": {
+                "summary": "Erro no processamento",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "422",
+                    "errorCode": "API-TMFNCSOMSERVICEINVENTORY-001",
+                    "message": "Unprocessable Entity",
+                    "detailedMessage": "[02] - SERVICO NAO PARAMETRIZADO",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "429",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-429",
+                "message": "Too Many Requests",
+                "detailedMessage": "Consumer requests exceeded policies",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "examples": {
+              "DefaultInternalServerError": {
+                "summary": "Internal Server Error Padrão",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "API-TMFNCSOMSERVICEINVENTORY-500",
+                    "message": "Internal Server Error",
+                    "detailedMessage": "Internal server error",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_1800": {
+                "summary": "Several lifecycle transitions",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "ESO_1800",
+                    "message": "Internal Server Error",
+                    "detailedMessage": "Several lifecycle transitions",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_1801": {
+                "summary": "Ambiguous decomposition",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "ESO_1801",
+                    "message": "Internal Server Error",
+                    "detailedMessage": "Ambiguous decomposition",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_1802": {
+                "summary": "Can't build decomposition query",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "ESO_1802",
+                    "message": "Internal Server Error",
+                    "detailedMessage": "Can't build decomposition query",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_1803": {
+                "summary": "Can't build decomposition query",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "ESO_1803",
+                    "message": "Internal Server Error",
+                    "detailedMessage": "Can't build decomposition query",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "ESO_1804": {
+                "summary": "Can't build decomposition query",
+                "value": {
+                  "apiVersion": "1;2025-10-17",
+                  "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "ESO_1804",
+                    "message": "Internal Server Error",
+                    "detailedMessage": "Can't build decomposition query",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServiceUnavailable": {
+        "description": "Service Unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/errorResponse"
+            },
+            "example": {
+              "apiVersion": "1;2025-10-17",
+              "transactionId": "b6195102-ea4f-44e8-fed5-386e4ec2a373",
+              "error": {
+                "httpCode": "503",
+                "errorCode": "API-TMFNCSOMSERVICEINVENTORY-503",
+                "message": "Service Unavailable",
+                "detailedMessage": "Service Unavailable",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

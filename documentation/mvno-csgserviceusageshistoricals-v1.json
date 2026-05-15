@@ -1,0 +1,1351 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MVNO - CSG Service Usages Historicals \n  (Proxy Apigee: mvno-csgserviceusageshistoricals-v1)",
+    "description": "<table>\n  <thead>\n    <tr>\n      <th>Versão</th>\n      <th>Elaborado por</th>\n      <th>Data</th>\n      <th>Alterações</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>1.0.0</td>\n      <td>Guilherme Xavier</td>\n      <td>2026-03-25</td>\n      <td>[MVNO] - Versão Inicial</td>\n    </tr>\n    <tr>\n  </tbody>\n</table>\n\n\n## Objetivo\n API responsável por realizar a consulta do consumo de Dados, Voz e SMS de um assinante MVNO dentro de um período.\n\n  \n\n## Público-Alvo\n O Público Alvo dessa API são as plataformas de MVNO da Claro.\n\n  \n## Provedores\nO Backend provedor dessa API é o CSG Ascendon.\n## Contexto em que a API se Insere\nEssa API está inserida no contexto das API's voltadas para plataformas de MVNO Claro.",
+    "version": "1;2026-03-25",
+    "contact": {
+      "name": "(CC-Integração)",
+      "email": "coee.api.integracao@claro.com.br"
+    },
+    "x-claro-domains": [
+      "Usage Consumption"
+    ]
+  },
+  "servers": [
+    {
+      "url": "https://api-sandbox.claro.com.br/mvno/v1",
+      "description": "Sandbox (SaaS)"
+    },
+    {
+      "url": "https://test.apigw.claro.com.br/mvno/v1",
+      "description": "Test (on-premises)"
+    },
+    {
+      "url": "https://api-lab.claro.com.br/mvno/v1",
+      "description": "Lab (SaaS)"
+    },
+    {
+      "url": "https://api-dev.claro.com.br/mvno/v1",
+      "description": "Dev (SaaS)"
+    },
+    {
+      "url": "https://api-test.claro.com.br/mvno/v1",
+      "description": "Test (SaaS)"
+    },
+    {
+      "url": "https://api.claro.com.br/mvno/v1",
+      "description": "Production (SaaS)"
+    },
+    {
+      "url": "https://cas.apigw.claro.com.br/mvno/v1",
+      "description": "Production (on-premises DC Campinas)"
+    },
+    {
+      "url": "https://lpa.apigw.claro.com.br/mvno/v1",
+      "description": "Production (on-premises DC Lapa)"
+    }
+  ],
+  "security": [
+    {
+      "BasicAuth": []
+    },
+    {
+      "BearerAuth": []
+    },
+    {
+      "ApiKeyAuth": []
+    },
+    {
+      "OAuth2": []
+    },
+    {
+      "ClientAuthHeader": []
+    }
+  ],
+  "paths": {
+    "/csg/serviceusages/historicals": {
+      "post": {
+        "tags": [
+          "Subscriber Usages"
+        ],
+        "summary": "API responsável por retornar o histórico de consumo de Dados, Voz e SMS de um assinante MVNO detalhados por período ou ciclo. 'Backend: CSG Ascendon'",
+        "x-claro-backends": [
+          "CSG Ascendon"
+        ],
+        "x-claro-domains": [
+          "Usage Consumption"
+        ],
+        "description": "API responsável por retornar o histórico de consumo de Dados, Voz e SMS de um assinante MVNO detalhados por período ou ciclo.",
+        "parameters": [
+          {
+            "name": "CD-ServiceIdentifier",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "5511999999999"
+            },
+            "description": "Número do MSISDN."
+          },
+          {
+            "name": "CD-SubscriberId",
+            "in": "header",
+            "required": false,
+            "description": "Código de identificação do assinante na plataforma do Ascendon.",
+            "schema": {
+              "type": "integer",
+              "example": "5921084"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriberUsageDetailsReportRequest"
+              },
+              "examples": {
+                "byCycleDefault": {
+                  "summary": "Consumo detalhado por Ciclo de Faturamento",
+                  "value": {
+                    "usageByCycle": true,
+                    "numberOfCycles": 6,
+                    "pagination": { "page": 1, "pageSize": 1000 }
+                  }
+                },
+                "byPeriodFlat": {
+                  "summary": "Consumo detalhado por Período",
+                  "value": {
+                    "usageByCycle": false,
+                    "period": { "from": "2025-09-01", "to": "2025-11-01" },
+                    "pagination": { "page": 1, "pageSize": 70 }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriberUsageDetailsReportResponse"
+                },
+                "examples": {
+                  "usagesDetail": {
+                    "summary": "Sucesso",
+                    "value": {
+                      "apiVersion": "1;2026-03-25",
+                      "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+                      "data": {
+                        "dateRange": {
+                          "from": "2026-01-15",
+                          "to": "2026-03-30"
+                        },
+                        "pagination": {
+                          "hasMore": false,
+                          "page": 1,
+                          "pageSize": 100
+                        },
+                        "subscriber": {
+                          "email": "29550364801@gmail.com",
+                          "name": {
+                            "firstName": "Plans",
+                            "lastName": "Testing"
+                          },
+                          "serviceIdentifier": "11913012735",
+                          "serviceIdentifierType": "MSISDN",
+                          "subscriberId": "7116716"
+                        },
+                        "usageByCycle": [
+                          {
+                            "cycleDateRange": {
+                              "from": "2026-01-15",
+                              "to": "2026-01-31"
+                            },
+                            "dataUsageRecords": [],
+                            "voiceUsageRecords": [],
+                            "smsUsageRecords": []
+                          },
+                          {
+                            "cycleDateRange": {
+                              "from": "2026-02-01",
+                              "to": "2026-02-28"
+                            },
+                            "dataUsageRecords": [],
+                            "voiceUsageRecords": [],
+                            "smsUsageRecords": []
+                          },
+                          {
+                            "cycleDateRange": {
+                              "from": "2026-03-01",
+                              "to": "2026-03-30"
+                            },
+                            "dataUsageRecords": [
+                              {
+                                "charge": {
+                                  "amount": 0.0,
+                                  "currency": "BRL"
+                                },
+                                "description": "Mobile Data Usage",
+                                "eventTimestamp": "2026-03-19T19:32:21Z",
+                                "quantity": 289.3759765625,
+                                "unit": "MB",
+                                "roaming": false,
+                                "usageDate": "2026-03-19",
+                                "usageTime": "19:32:21"
+                              },
+                              {
+                                "charge": {
+                                  "amount": 0.0,
+                                  "currency": "BRL"
+                                },
+                                "description": "Mobile Data Usage",
+                                "eventTimestamp": "2026-03-19T19:32:45Z",
+                                "quantity": 289.3759765625,
+                                "unit": "MB",
+                                "roaming": false,
+                                "usageDate": "2026-03-19",
+                                "usageTime": "19:32:45"
+                              }
+                            ],
+                            "voiceUsageRecords": [],
+                            "smsUsageRecords": []
+                          }
+                        ],
+                        "dataUsageRecords": [
+                          {
+                            "charge": {
+                              "amount": 0.0,
+                              "currency": "BRL"
+                            },
+                            "description": "Mobile Data Usage",
+                            "eventTimestamp": "2026-03-19T19:32:21Z",
+                            "quantity": 289.3759765625,
+                            "unit": "MB",
+                            "roaming": false,
+                            "usageDate": "2026-03-19",
+                            "usageTime": "19:32:21"
+                          },
+                          {
+                            "charge": {
+                              "amount": 0.0,
+                              "currency": "BRL"
+                            },
+                            "description": "Mobile Data Usage",
+                            "eventTimestamp": "2026-03-19T19:32:45Z",
+                            "quantity": 289.3759765625,
+                            "unit": "MB",
+                            "roaming": false,
+                            "usageDate": "2026-03-19",
+                            "usageTime": "19:32:45"
+                          }
+                        ],
+                        "voiceUsageRecords": [],
+                        "smsUsageRecords": []
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-400"
+          },
+          "401": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-401"
+          },
+          "403": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-403"
+          },
+          "404": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-404"
+          },
+          "406": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-406"
+          },
+          "409": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-409"
+          },
+          "410": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-410"
+          },
+          "415": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-415"
+          },
+          "422": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-422"
+          },
+          "429": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-429"
+          },
+          "500": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-500"
+          },
+          "503": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-503"
+          }
+        }
+      }
+    },
+    "/csg/serviceusages/historicals/bycycle": {
+      "post": {
+        "tags": [
+          "Subscriber Usages"
+        ],
+        "summary": "API responsável por retornar o histórico de consumo de Dados, Voz e SMS de um assinante MVNO totalizados por ciclo. 'Backend: CSG Ascendon'",
+        "x-claro-backends": [
+          "CSG Ascendon"
+        ],
+        "x-claro-domains": [
+          "Usage Consumption"
+        ],
+        "description": "API responsável por retornar o histórico de consumo de Dados, Voz e SMS de um assinante MVNO totalizados por ciclo.",
+        "parameters": [
+          {
+            "name": "CD-ServiceIdentifier",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "5511999999999"
+            },
+            "description": "Número do MSISDN."
+          },
+          {
+            "name": "CD-SubscriberId",
+            "in": "header",
+            "required": false,
+            "description": "Código de identificação do assinante na plataforma do Ascendon.",
+            "schema": {
+              "type": "integer",
+              "example": "5921084"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SubscriberUsageMonthlyReportRequest" },
+              "example": {
+                "numberOfCycles": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriberUsageMonthlyReportResponse" 
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "apiVersion": "1;2026-03-25",
+                      "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+                      "data": {
+                        "dateRange": { "from": "2025-06-15", "to": "2025-11-14" },
+                        "subscriber": {
+                          "serviceIdentifier": "5511999999999",
+                          "serviceIdentifierType": "MSISDN",
+                          "subscriberId": "12345",
+                          "email": "user@example.com",
+                          "name": { "firstName": "Jane", "lastName": "Doe" },
+                          "address": {
+                            "line1": "Rua Example 123",
+                            "line2": "Apt 45",
+                            "city": "São Paulo",
+                            "state": "SP",
+                            "postalCode": "01310-100",
+                            "country": "Brazil"
+                          }
+                        },
+                        "voiceUsageByCycle": [
+                          {
+                            "month": "JUN 2025-JUL 2025",
+                            "value": 120.5,
+                            "unit": "MIN"
+                          },
+                          {
+                            "month": "JUL 2025-AUG 2025",
+                            "value": 95.25,
+                            "unit": "MIN"
+                          }
+                        ],
+                        "smsUsageByCycle": [
+                          {
+                            "month": "JUN 2025-JUL 2025",
+                            "value": 45,
+                            "unit": "COUNT"
+                          },
+                          {
+                            "month": "JUL 2025-AUG 2025",
+                            "value": 32,
+                            "unit": "COUNT"
+                          }
+                        ],
+                        "dataUsageByCycle": [
+                          {
+                            "month": "JUN 2025-JUL 2025",
+                            "value": 2048.5432,
+                            "unit": "MB"
+                          },
+                          {
+                            "month": "JUL 2025-AUG 2025",
+                            "value": 3072.1234,
+                            "unit": "MB"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-400"
+          },
+          "401": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-401"
+          },
+          "403": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-403"
+          },
+          "404": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-404"
+          },
+          "406": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-406"
+          },
+          "409": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-409"
+          },
+          "410": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-410"
+          },
+          "415": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-415"
+          },
+          "422": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-422"
+          },
+          "429": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-429"
+          },
+          "500": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-500"
+          },
+          "503": {
+            "$ref": "#/components/responses/API-CSGSERVICEUSAGESHISTORICALS-503"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "API-CSGSERVICEUSAGESHISTORICALS-400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "examples": {
+              "API-CSGSERVICEUSAGESHISTORICALS-400": {
+                "value": {
+                  "apiVersion": "1;2026-03-25",
+                  "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-400",
+                    "message": "Bad Request",
+                    "detailedMessage": "Invalid Request for operation.",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "API-CSGSERVICEUSAGESHISTORICALS-400-01": {
+                "value": {
+                  "apiVersion": "1;2026-03-25",
+                  "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+                  "error": {
+                    "httpCode": "400",
+                    "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-400",
+                    "message": "Bad Request",
+                    "detailedMessage": "O campo [nome_campo] é obrigatório.",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "401",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-401",
+                "message": "Unauthorized",
+                "detailedMessage": "Unauthorized user.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "examples": {
+              "API-CSGSERVICEUSAGESHISTORICALS-403": {
+                "value": {
+                  "apiVersion": "1;2026-03-25",
+                  "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+                  "error": {
+                    "httpCode": "403",
+                    "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-403",
+                    "message": "Forbidden",
+                    "detailedMessage": "Access denied.",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-404": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "404",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-404",
+                "message": "Not found",
+                "detailedMessage": "Resource not found.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-406": {
+        "description": "Not Acceptable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "406",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-406",
+                "message": "Request Not Acceptable",
+                "detailedMessage": "Requested content type not acceptable.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-409": {
+        "description": "Conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "409",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-409",
+                "message": "Conflict",
+                "detailedMessage": "Conflict.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-410": {
+        "description": "Gone",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "410",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-410",
+                "message": "Resource Unavailable",
+                "detailedMessage": "The resource is no longer available.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-415": {
+        "description": "Unsupported Media Type",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "415",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-415",
+                "message": "Unsupported Media Type",
+                "detailedMessage": "Unsupported request media type.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-422": {
+        "description": "### Unprocessable Entity - Identify business errors that can be detailed according to backend system rules.\n---\n__The possible values are:__\n* API-CSGSERVICEUSAGESHISTORICALS-001: Subscriber not found.\n* API-CSGSERVICEUSAGESHISTORICALS-002: Subscriber 5511999999999 does not have enough usage history. Active for less than 1 month.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "422",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-422",
+                "message": "Unprocessable Entity",
+                "detailedMessage": "Business fault occurred.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-429": {
+        "description": "Too Many Requests",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "429",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-429",
+                "message": "Too Many Requests",
+                "detailedMessage": "Consumer requests exceeded policies.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-500": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "examples": {
+              "InternalServerError": {
+                "value": {
+                  "apiVersion": "1;2026-03-25",
+                  "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-500",
+                    "message": "Internal Server Error",
+                    "detailedMessage": "Internal Server Error",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              },
+              "BackendError": {
+                "value": {
+                  "apiVersion": "1;2026-03-25",
+                  "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+                  "error": {
+                    "httpCode": "500",
+                    "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-500",
+                    "message": "Backend Error",
+                    "detailedMessage": "Backend Error",
+                    "link": {
+                      "rel": "related",
+                      "href": "https://api.claro.com.br/docs"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      },
+      "API-CSGSERVICEUSAGESHISTORICALS-503": {
+        "description": "Service unavailable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            },
+            "example": {
+              "apiVersion": "1;2026-03-25",
+              "transactionId": "5963d53d-8726-421b-af13-8c8294445a5e",
+              "error": {
+                "httpCode": "503",
+                "errorCode": "API-CSGSERVICEUSAGESHISTORICALS-503",
+                "message": "Service Unavailable",
+                "detailedMessage": "Service Unavailable.",
+                "link": {
+                  "rel": "related",
+                  "href": "https://api.claro.com.br/docs"
+                }
+              }
+            }
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          },
+          "application/javascript": {
+            "schema": {
+              "$ref": "#/components/schemas/error"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "error": {
+        "description": "Object returned when an error occurs (4xx/5xx)",
+        "type": "object",
+        "required": [
+          "apiVersion",
+          "transactionId",
+          "error"
+        ],
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Major and minor API Version.",
+            "example": "1;2019-09-11"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Transaction´s tracking identification generated by API.",
+            "example": "Id-2d0384f0823434"
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "httpCode": {
+                "type": "string",
+                "description": "HTTP error code"
+              },
+              "errorCode": {
+                "type": "string",
+                "description": "Internal API error code. Ex.: API-3566. This code can be used by consumer to map its error message."
+              },
+              "message": {
+                "type": "string",
+                "description": "Error Message."
+              },
+              "detailedMessage": {
+                "type": "string",
+                "description": "Detailed error message."
+              },
+              "link": {
+                "type": "object",
+                "description": "Object containing page link to errors detailed documentation on API Portal.",
+                "properties": {
+                  "rel": {
+                    "type": "string",
+                    "enum": [
+                      "related"
+                    ],
+                    "description": "To reference the API portal error page is used the “related” semantics in this scenario."
+                  },
+                  "href": {
+                    "type": "string",
+                    "description": "Resource URL"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "xml": {
+          "name": "xml"
+        }
+      },
+      "SubscriberUsageMonthlyReportRequest": {
+        "type": "object",
+        "properties": {
+          "numberOfCycles": {
+            "type": "integer",
+            "default": 6,
+            "minimum": 1,
+            "description": "Number of billing cycles (months) to include. If it not included. It will Defaults to 6."
+          }
+        }
+      },
+      "SubscriberUsageMonthlyReportResponse": {
+        "required": [
+          "apiVersion",
+          "transactionId",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2015-08-12”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "2;2020-06-11"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "e6e4e0f4-089d-4194-845e-78f45426f7c7"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "dateRange": { "$ref": "#/components/schemas/SubscriberUsageMonthlyDateRange" },
+              "subscriber": { "$ref": "#/components/schemas/SubscriberUsageMonthlySubscriber" },
+              "voiceUsageByCycle": {
+                "type": "array",
+                "description": "Monthly aggregated voice usage in minutes (MIN)",
+                "items": { "$ref": "#/components/schemas/MonthlyUsageEntry" }
+              },
+              "smsUsageByCycle": {
+                "type": "array",
+                "description": "Monthly aggregated SMS usage count (COUNT)",
+                "items": { "$ref": "#/components/schemas/MonthlyUsageEntry" }
+              },
+              "dataUsageByCycle": {
+                "type": "array",
+                "description": "Monthly aggregated data usage in megabytes (MB)",
+                "items": { "$ref": "#/components/schemas/MonthlyUsageEntry" }
+              }
+            }
+          }
+        }
+      },
+      "SubscriberUsageMonthlyReportFaultResponse": {
+        "type": "object",
+        "description": "Returned with **HTTP 200** when `RetrieveSubscriberUsageMonthlyReport` catches `FaultException` and returns `Ok(CreateFaultResponse(faultEx.Fault))`. Also returned with **HTTP 404** for `NotFoundException`. Shape from `SubscriberController.CreateFaultResponse`.",
+        "properties": {
+          "contextId": { "type": "string", "format": "uuid" },
+          "fault": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "integer" },
+              "message": { "type": "string" },
+              "severity": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "SubscriberUsageMonthlyDateRange": {
+        "type": "object",
+        "description": "Date range covered by the monthly report",
+        "properties": {
+          "from": { "type": "string", "description": "Start date (yyyy-MM-dd)" },
+          "to": { "type": "string", "description": "End date (yyyy-MM-dd)" }
+        }
+      },
+      "SubscriberUsageMonthlySubscriber": {
+        "type": "object",
+        "description": "Subscriber information in the monthly usage report",
+        "properties": {
+          "address": { "$ref": "#/components/schemas/SubscriberUsageMonthlyAddress" },
+          "email": { "type": "string" },
+          "name": { "$ref": "#/components/schemas/SubscriberUsageMonthlySubscriberName" },
+          "serviceIdentifier": { "type": "string", "description": "MSISDN or service identifier" },
+          "serviceIdentifierType": { "type": "string", "description": "Type of identifier (e.g. MSISDN)" },
+          "subscriberId": { "type": "string", "description": "Ascendon subscriber ID" }
+        }
+      },
+      "SubscriberUsageMonthlyAddress": {
+        "type": "object",
+        "description": "Subscriber address details",
+        "properties": {
+          "city": { "type": "string" },
+          "country": { "type": "string" },
+          "line1": { "type": "string" },
+          "line2": { "type": "string" },
+          "postalCode": { "type": "string" },
+          "state": { "type": "string" }
+        }
+      },
+      "SubscriberUsageMonthlySubscriberName": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" }
+        }
+      },
+      "MonthlyUsageEntry": {
+        "type": "object",
+        "description": "One billing cycle's aggregated usage value",
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "Billing cycle month range (e.g. 'JAN 2026-FEB 2026')",
+            "example": "JAN 2026-FEB 2026"
+          },
+          "value": {
+            "type": "number",
+            "description": "Aggregated usage value for the cycle"
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit of measurement: MIN (voice minutes), COUNT (SMS count), MB (data megabytes)",
+            "enum": [ "MIN", "COUNT", "MB" ]
+          }
+        }
+      },
+      "SubscriberUsageDetailsReportRequest": {
+        "type": "object",
+        "properties": {
+          "usageByCycle": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "True or omitted: grouped cycles + activation window. False: flat lists + period (or default months)."
+          },
+          "numberOfCycles": {
+            "type": "integer",
+            "format": "int32",
+            "default": 6,
+            "description": "Billing cycle count when usageByCycle is enabled. **0** or omitted request → treated as **6**."
+          },
+          "period": {
+            "$ref": "#/components/schemas/SubscriberUsageDetailsReportPeriod"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/SubscriberUsageDetailsReportPagination"
+          }
+        }
+      },
+      "SubscriberUsageDetailsReportPeriod": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Start date (e.g. yyyy-MM-dd)",
+            "example": "2025-09-01"
+          },
+          "to": {
+            "type": "string",
+            "description": "End date (e.g. yyyy-MM-dd)",
+            "example": "2025-11-01"
+          }
+        }
+      },
+      "SubscriberUsageDetailsReportPagination": {
+        "type": "object",
+        "properties": {
+          "page": { "type": "integer", "format": "int32", "default": 1 },
+          "pageSize": { "type": "integer", "format": "int32", "default": 1000 }
+        }
+      },
+      "SubscriberUsageDetailsReportResponse": {
+        "required": [
+          "apiVersion",
+          "transactionId",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "apiVersion": {
+            "type": "string",
+            "description": "Retorna sempre a versão major e minor da API efetivamente consumida. O formato é “versão major;versão minor”. Exemplo: “apiVersion”: “2;2015-08-12”. Quando a versão minor não é solicitada, a versão contratada pelo cliente é retornada. Quando não há restrição de contratação, retorna a última disponível.",
+            "example": "2;2020-06-11"
+          },
+          "transactionId": {
+            "type": "string",
+            "description": "Retorna o identificador de rastreabilidade de transação gerado pela API.",
+            "example": "e6e4e0f4-089d-4194-845e-78f45426f7c7"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "dateRange": { "$ref": "#/components/schemas/SubscriberUsageDetailsDateRange" },
+              "pagination": { "$ref": "#/components/schemas/SubscriberUsageDetailsResponsePagination" },
+              "subscriber": { "$ref": "#/components/schemas/SubscriberUsageDetailsSubscriber" },
+              "usageByCycle": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/UsageDetailsByCycle" },
+                "nullable": true
+              },
+              "dataUsageRecords": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/DataUsageRecord" }
+              },
+              "voiceUsageRecords": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/VoiceUsageRecord" }
+              },
+              "smsUsageRecords": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/SmsUsageRecord" }
+              }
+            }
+          }
+        }
+      },
+      "SubscriberUsageDetailsDateRange": {
+        "type": "object",
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" }
+        }
+      },
+      "SubscriberUsageDetailsResponsePagination": {
+        "type": "object",
+        "properties": {
+          "hasMore": { "type": "boolean" },
+          "page": { "type": "integer", "format": "int32" },
+          "pageSize": { "type": "integer", "format": "int32" }
+        }
+      },
+      "SubscriberUsageDetailsSubscriber": {
+        "type": "object",
+        "properties": {
+          "address": { "$ref": "#/components/schemas/SubscriberUsageDetailsAddress" },
+          "email": { "type": "string", "nullable": true },
+          "name": { "$ref": "#/components/schemas/SubscriberUsageDetailsSubscriberName" },
+          "serviceIdentifier": { "type": "string", "nullable": true },
+          "serviceIdentifierType": { "type": "string", "nullable": true },
+          "subscriberId": { "type": "string", "nullable": true }
+        }
+      },
+      "SubscriberUsageDetailsAddress": {
+        "type": "object",
+        "properties": {
+          "city": { "type": "string", "nullable": true },
+          "country": { "type": "string", "nullable": true },
+          "line1": { "type": "string", "nullable": true },
+          "line2": { "type": "string", "nullable": true },
+          "postalCode": { "type": "string", "nullable": true },
+          "state": { "type": "string", "nullable": true }
+        }
+      },
+      "SubscriberUsageDetailsSubscriberName": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string", "nullable": true },
+          "lastName": { "type": "string", "nullable": true }
+        }
+      },
+      "SubscriberUsageDetailsCycleDateRange": {
+        "type": "object",
+        "properties": {
+          "from": { "type": "string", "nullable": true },
+          "to": { "type": "string", "nullable": true }
+        }
+      },
+      "UsageDetailsByCycle": {
+        "type": "object",
+        "properties": {
+          "cycleDateRange": { "$ref": "#/components/schemas/SubscriberUsageDetailsCycleDateRange" },
+          "dataUsageRecords": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DataUsageRecord" }
+          },
+          "voiceUsageRecords": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/VoiceUsageRecord" }
+          },
+          "smsUsageRecords": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SmsUsageRecord" }
+          }
+        }
+      },
+      "DataUsageRecord": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string", "nullable": true },
+          "eventTimestamp": { "type": "string", "nullable": true },
+          "quantity": { "type": "number", "description": "Display quantity (e.g. normalized KB/MB/GB for data)." },
+          "actualUsageAmount": { "type": "number", "description": "Parsed biller ActualUsageAmount; for data in bytes, scaled to same unit as quantity when applicable." },
+          "unit": { "type": "string", "nullable": true },
+          "roaming": { "type": "boolean" },
+          "usageDate": { "type": "string", "nullable": true },
+          "usageTime": { "type": "string", "nullable": true }
+        }
+      },
+      "VoiceUsageRecord": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string", "nullable": true },
+          "direction": { "type": "string", "nullable": true },
+          "eventTimestamp": { "type": "string", "nullable": true },
+          "from": { "type": "string", "nullable": true },
+          "quantity": { "type": "number" },
+          "actualUsageAmount": { "type": "number" },
+          "unit": { "type": "string", "nullable": true },
+          "roaming": { "type": "boolean" },
+          "to": { "type": "string", "nullable": true },
+          "usageDate": { "type": "string", "nullable": true },
+          "usageTime": { "type": "string", "nullable": true }
+        }
+      },
+      "SmsUsageRecord": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string", "nullable": true },
+          "direction": { "type": "string", "nullable": true },
+          "eventTimestamp": { "type": "string", "nullable": true },
+          "from": { "type": "string", "nullable": true },
+          "quantity": { "type": "number" },
+          "actualUsageAmount": { "type": "number" },
+          "unit": { "type": "string", "nullable": true },
+          "roaming": { "type": "boolean" },
+          "to": { "type": "string", "nullable": true },
+          "usageDate": { "type": "string", "nullable": true },
+          "usageTime": { "type": "string", "nullable": true }
+        }
+      },
+      "errorDetails": {
+        "type": "object",
+        "description": "Objeto retornado quando ocorre erro no response de alguma das API's orquestradas pela CSG.",
+        "properties": {
+          "Code": {
+            "type": "string",
+            "description": "Recebe ou define o codigo de erro.",
+            "nullable": true
+          },
+          "Message": {
+            "type": "string",
+            "description": "Recebe ou define a mensagem de erro.",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ClientAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Client-Auth"
+      },
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Client-Key"
+      },
+      "OAuth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "/oauth2/v1/token",
+            "scopes": {}
+          }
+        }
+      }
+    }
+  }
+}
