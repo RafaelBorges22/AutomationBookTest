@@ -202,6 +202,23 @@ export interface RowData {
   step_description?: string;
 }
 
+export interface UserInputs {
+  zNumber: string;
+  userEmail: string;
+  swaggerFilePath: string;
+  productAreas: string; // <-- Adicionado
+}
+
+export interface GeneratedTestCase {
+  ctFormatado: string;
+  scenario: TestScenario;
+  methodConfig: MethodConfig;
+  endpointDesc: string;
+  userEmail: string;
+  productAreas: string; // <-- Adicionado para passar do CLI para o Excel
+  mandatoryParams?: Record<string, MandatoryParam>;
+}
+
 export const HEADERS: string[] = [
   "unique_id",
   "type",
